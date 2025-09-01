@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { BreadcrumbProvider } from './contexts/BreadcrumbContext'
+import { usePWALaunch, PWAActions } from './hooks/usePWALaunch'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import Sidebar from './components/Sidebar'
@@ -37,6 +38,22 @@ const AuthenticatedLayout = () => {
 
 function AppContent() {
   const { isAuthenticated, loading } = useAuth()
+  const launchInfo = usePWALaunch()
+
+  // Handle launch actions
+  React.useEffect(() => {
+    if (launchInfo.source) {
+      PWAActions.handleLaunchSource(launchInfo.source)
+    }
+    
+    if (launchInfo.isFirstLaunch) {
+      console.log('🎉 First PWA launch detected!')
+      // You can show a welcome tour or special onboarding here
+    }
+
+    // Register protocol handler for custom URLs
+    PWAActions.registerProtocolHandler()
+  }, [launchInfo])
 
   if (loading) {
     return (

@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'vite.svg'],
+      includeAssets: ['favicon.ico', 'logo.png'],
       manifest: {
         name: 'VetClinic Pro - Veterinary Management System',
         short_name: 'VetClinic Pro',
@@ -18,34 +18,52 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait-primary',
         scope: '/',
-        start_url: '/',
-        id: '/',
+        start_url: '/?source=pwa',
+        id: 'vetclinic-pro',
         categories: ['medical', 'business', 'productivity'],
         lang: 'en',
         dir: 'ltr',
+        launch_handler: {
+          client_mode: 'navigate-existing'
+        },
+        protocol_handlers: [
+          {
+            protocol: 'web+vetclinic',
+            url: '/?action=%s'
+          }
+        ],
+        file_handlers: [
+          {
+            action: '/file-handler',
+            accept: {
+              'text/csv': ['.csv'],
+              'application/pdf': ['.pdf']
+            }
+          }
+        ],
         icons: [
           {
-            src: 'vite.svg',
+            src: 'logo.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'vite.svg',
+            src: 'logo.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'vite.svg',
+            src: 'logo.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'maskable'
           },
           {
-            src: 'vite.svg',
+            src: 'logo.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'maskable'
           }
         ],
@@ -54,13 +72,36 @@ export default defineConfig({
             name: 'Dashboard',
             short_name: 'Dashboard',
             description: 'View clinic dashboard',
-            url: '/dashboard',
-            icons: [{ src: 'vite.svg', sizes: '192x192' }]
+            url: '/dashboard?source=shortcut',
+            icons: [{ src: 'logo.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Patients',
+            short_name: 'Patients',
+            description: 'Manage patient records',
+            url: '/patients?source=shortcut',
+            icons: [{ src: 'logo.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Appointments',
+            short_name: 'Appointments',
+            description: 'Schedule and manage appointments',
+            url: '/appointments?source=shortcut',
+            icons: [{ src: 'logo.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Quick Add Patient',
+            short_name: 'Add Patient',
+            description: 'Quickly add a new patient',
+            url: '/patients/new?source=shortcut',
+            icons: [{ src: 'logo.png', sizes: '192x192' }]
           }
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com/,
