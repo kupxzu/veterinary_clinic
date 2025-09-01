@@ -1,0 +1,295 @@
+import React from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card'
+import { Badge } from '../components/ui/Badge'
+import { Breadcrumb } from '../components/ui/Breadcrumb'
+import { 
+  HeartIcon, 
+  CalendarIcon, 
+  FileTextIcon,
+  PersonIcon,
+  ActivityLogIcon,
+  PlusIcon,
+  ArrowUpIcon,
+  ArrowDownIcon
+} from '@radix-ui/react-icons'
+
+const Dashboard = () => {
+  const { user } = useAuth()
+
+  const stats = [
+    {
+      title: "Total Patients",
+      value: "1,234",
+      change: "+12%",
+      description: "Active pet patients",
+      icon: HeartIcon,
+      trend: "up"
+    },
+    {
+      title: "Today's Appointments",
+      value: "23",
+      change: "+3",
+      description: "Scheduled for today",
+      icon: CalendarIcon,
+      trend: "up"
+    },
+    {
+      title: "Active Staff",
+      value: "12",
+      change: "±0",
+      description: "Veterinarians and staff",
+      icon: PersonIcon,
+      trend: "neutral"
+    },
+    {
+      title: "Recent Records",
+      value: "89",
+      change: "+15%",
+      description: "Updated this week",
+      icon: FileTextIcon,
+      trend: "up"
+    }
+  ]
+
+  const quickActions = [
+    {
+      title: "New Appointment",
+      description: "Schedule a new patient visit",
+      icon: CalendarIcon,
+      color: "bg-blue-500"
+    },
+    {
+      title: "Add Patient",
+      description: "Register a new pet patient",
+      icon: PlusIcon,
+      color: "bg-green-500"
+    },
+    {
+      title: "View Records",
+      description: "Browse patient records",
+      icon: FileTextIcon,
+      color: "bg-purple-500"
+    },
+    {
+      title: "Staff Management",
+      description: "Manage clinic staff",
+      icon: PersonIcon,
+      color: "bg-orange-500"
+    }
+  ]
+
+  const recentActivity = [
+    {
+      title: "New appointment scheduled",
+      time: "5 minutes ago",
+      color: "bg-blue-500"
+    },
+    {
+      title: "Patient record updated",
+      time: "12 minutes ago",
+      color: "bg-green-500"
+    },
+    {
+      title: "New staff member added",
+      time: "2 hours ago",
+      color: "bg-orange-500"
+    },
+    {
+      title: "System backup completed",
+      time: "3 hours ago",
+      color: "bg-purple-500"
+    }
+  ]
+
+  const getTrendIcon = (trend) => {
+    if (trend === 'up') return <ArrowUpIcon className="h-3 w-3 text-green-600" />
+    if (trend === 'down') return <ArrowDownIcon className="h-3 w-3 text-red-600" />
+    return null
+  }
+
+  const getTrendColor = (trend) => {
+    switch (trend) {
+      case 'up': return 'text-green-600'
+      case 'down': return 'text-red-600'
+      default: return 'text-muted-foreground'
+    }
+  }
+
+  return (
+    <div className="h-full w-full p-6 space-y-6 overflow-y-auto">
+      {/* Breadcrumb */}
+      <Breadcrumb 
+        items={[
+          { label: 'Dashboard', href: null }
+        ]} 
+      />
+      
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="mt-1 text-gray-600">
+          Welcome back, {user?.name}! Here's what's happening at your clinic today.
+        </p>
+      </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon
+            return (
+              <Card key={index} className="bg-white shadow hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    {stat.title}
+                  </CardTitle>
+                  <IconComponent className="h-4 w-4 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
+                  <div className="flex items-center space-x-1 mt-1">
+                    {getTrendIcon(stat.trend)}
+                    <span className={`text-sm ${getTrendColor(stat.trend)}`}>
+                      {stat.change}
+                    </span>
+                    <p className="text-sm text-gray-500 ml-1">
+                      {stat.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Quick Actions */}
+          <Card className="lg:col-span-2 bg-white shadow">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-3 text-xl text-gray-900">
+                <ActivityLogIcon className="h-6 w-6" />
+                <span>Quick Actions</span>
+              </CardTitle>
+              <CardDescription className="text-base text-gray-600">
+                Frequently used clinic management tools
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                {quickActions.map((action, index) => {
+                  const IconComponent = action.icon
+                  const bgColor = action.color === 'bg-blue-500' ? 'bg-blue-100' : 
+                                 action.color === 'bg-green-500' ? 'bg-green-100' :
+                                 action.color === 'bg-purple-500' ? 'bg-purple-100' : 'bg-orange-100'
+                  const iconColor = action.color === 'bg-blue-500' ? 'text-blue-500' : 
+                                   action.color === 'bg-green-500' ? 'text-green-500' :
+                                   action.color === 'bg-purple-500' ? 'text-purple-500' : 'text-orange-500'
+                  return (
+                    <div 
+                      key={index} 
+                      className="group cursor-pointer rounded-lg border border-gray-200 p-6 hover:bg-gray-50 transition-colors hover:shadow-md"
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div className={`p-3 rounded-lg ${bgColor} group-hover:scale-110 transition-transform`}>
+                          <IconComponent className={`h-5 w-5 ${iconColor}`} />
+                        </div>
+                        <div className="space-y-2 flex-1 min-w-0">
+                          <h4 className="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                            {action.title}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {action.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card className="lg:col-span-1 bg-white shadow">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-3 text-xl text-gray-900">
+                <ActivityLogIcon className="h-6 w-6" />
+                <span>Recent Activity</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-start space-x-4">
+                    <div className={`h-3 w-3 rounded-full mt-2 ${activity.color}`}></div>
+                    <div className="space-y-1 flex-1">
+                      <p className="text-sm font-medium leading-tight text-gray-900">
+                        {activity.title}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {activity.time}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* PWA Status */}
+        <Card className="bg-white shadow">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center space-x-3 text-xl text-gray-900">
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              <span>Progressive Web App</span>
+              <Badge variant="secondary" className="text-sm">Enabled</Badge>
+            </CardTitle>
+            <CardDescription className="text-base text-gray-600">
+              This application supports offline functionality and can be installed on your device
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4 p-6 border rounded-lg bg-green-50 border-green-200">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-6 w-6 text-green-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="space-y-2 flex-1">
+                <p className="text-base font-medium text-green-800">
+                  PWA features are active
+                </p>
+                <p className="text-sm text-green-700">
+                  Install this app on your device for the best experience. Works offline and receives automatic updates.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+  )
+}
+
+export default Dashboard
