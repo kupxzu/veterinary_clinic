@@ -2,7 +2,9 @@ import React from 'react'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
 import { Avatar, AvatarFallback } from './ui/Avatar'
+import { Breadcrumb } from './ui/Breadcrumb'
 import { useAuth } from '../contexts/AuthContext'
+import { useBreadcrumb } from '../contexts/BreadcrumbContext'
 import { 
   HamburgerMenuIcon,
   BellIcon,
@@ -12,6 +14,7 @@ import {
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuth()
+  const { breadcrumbs } = useBreadcrumb()
 
   const getInitials = (name) => {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'A'
@@ -52,8 +55,10 @@ const Header = ({ onMenuClick }) => {
             </div>
 
             {/* Breadcrumb for desktop */}
-            <div className="hidden lg:flex items-center space-x-2 text-sm">
-              <span className="text-muted-foreground">Dashboard</span>
+            <div className="hidden lg:flex items-center">
+              {breadcrumbs.length > 0 && (
+                <Breadcrumb items={breadcrumbs} />
+              )}
             </div>
           </div>
 

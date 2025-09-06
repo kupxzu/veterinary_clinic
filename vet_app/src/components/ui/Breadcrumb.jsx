@@ -28,6 +28,13 @@ const Breadcrumb = ({ items = [] }) => {
                 >
                   {item.label}
                 </a>
+              ) : item.onClick ? (
+                <button
+                  onClick={item.onClick}
+                  className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+                >
+                  {item.label}
+                </button>
               ) : (
                 <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
                   {item.label}

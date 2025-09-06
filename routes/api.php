@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PetController;
+use App\Http\Controllers\ClientPetsController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -19,3 +21,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/profile', [AdminController::class, 'profile']);
     });
 });
+
+// Pet API CRUD routes (renamed from vet-pet)
+Route::apiResource('pets', PetController::class);
+Route::get('pets/breeds/options', [PetController::class, 'getBreeds']);
+Route::get('pets/species/options', [PetController::class, 'getSpecies']);
+
+// Client and Client-Pet relationship routes
+Route::apiResource('clients', ClientPetsController::class);
+Route::post('clients/{client}/assign-pet', [ClientPetsController::class, 'assignPet']);
+Route::delete('clients/{client}/pets/{pet}', [ClientPetsController::class, 'removePet']);

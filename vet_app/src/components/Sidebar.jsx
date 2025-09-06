@@ -5,6 +5,7 @@ import { Badge } from './ui/Badge'
 import { Avatar, AvatarFallback } from './ui/Avatar'
 import { useAuth } from '../contexts/AuthContext'
 import { useBreadcrumb } from '../contexts/BreadcrumbContext'
+import { useNavigation } from '../contexts/NavigationContext'
 import { 
   DashboardIcon,
   PersonIcon, 
@@ -23,20 +24,21 @@ import {
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const { user, logout } = useAuth()
   const { updateBreadcrumbs } = useBreadcrumb()
+  const { currentPage, navigateTo } = useNavigation()
 
   const navigation = [
     {
       name: 'Dashboard',
       icon: DashboardIcon,
       href: '#',
-      current: true,
+      current: currentPage === 'Dashboard',
       breadcrumb: [{ label: 'Dashboard', href: null }]
     },
     {
       name: 'Patients',
       icon: HeartIcon,
       href: '#',
-      current: false,
+      current: currentPage === 'Patients',
       count: '1,234',
       breadcrumb: [{ label: 'Patients', href: null }]
     },
@@ -44,7 +46,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       name: 'Appointments',
       icon: CalendarIcon,
       href: '#',
-      current: false,
+      current: currentPage === 'Appointments',
       count: '23',
       breadcrumb: [{ label: 'Appointments', href: null }]
     },
@@ -52,36 +54,44 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       name: 'Medical Records',
       icon: FileTextIcon,
       href: '#',
-      current: false,
+      current: currentPage === 'Medical Records',
       breadcrumb: [{ label: 'Medical Records', href: null }]
     },
     {
       name: 'Staff',
       icon: PersonIcon,
       href: '#',
-      current: false,
+      current: currentPage === 'Staff',
       count: '12',
       breadcrumb: [{ label: 'Staff', href: null }]
+    },
+    {
+      name: 'Clients',
+      icon: PersonIcon,
+      href: '#',
+      current: currentPage === 'Clients',
+      breadcrumb: [{ label: 'Clients', href: null }]
     },
     {
       name: 'Reports',
       icon: BarChartIcon,
       href: '#',
-      current: false,
+      current: currentPage === 'Reports',
       breadcrumb: [{ label: 'Reports', href: null }]
     },
     {
       name: 'Activity Log',
       icon: ActivityLogIcon,
       href: '#',
-      current: false,
+      current: currentPage === 'Activity Log',
       breadcrumb: [{ label: 'Activity Log', href: null }]
     }
   ]
 
   const handleNavigation = (item) => {
-    // Update breadcrumbs when navigating
+    // Update breadcrumbs and current page when navigating
     updateBreadcrumbs(item.breadcrumb)
+    navigateTo(item.name)
     // Close mobile sidebar
     setIsOpen(false)
   }

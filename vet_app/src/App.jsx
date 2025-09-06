@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { BreadcrumbProvider } from './contexts/BreadcrumbContext'
+import { NavigationProvider, useNavigation } from './contexts/NavigationContext'
 import { usePWALaunch, PWAActions } from './hooks/usePWALaunch'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
+import ClientManagement from './components/ClientManagement'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -11,28 +13,56 @@ import PWAUpdatePrompt from './components/PWAUpdatePrompt'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import './App.css'
 
+// Component to render based on current page
+const PageRenderer = () => {
+  const { currentPage } = useNavigation()
+
+  switch (currentPage) {
+    case 'Dashboard':
+      return <Dashboard />
+    case 'Clients':
+      return <ClientManagement />
+    case 'Patients':
+      return <div className="p-6">Patients page - Coming soon</div>
+    case 'Appointments':
+      return <div className="p-6">Appointments page - Coming soon</div>
+    case 'Medical Records':
+      return <div className="p-6">Medical Records page - Coming soon</div>
+    case 'Staff':
+      return <div className="p-6">Staff page - Coming soon</div>
+    case 'Reports':
+      return <div className="p-6">Reports page - Coming soon</div>
+    case 'Activity Log':
+      return <div className="p-6">Activity Log page - Coming soon</div>
+    default:
+      return <Dashboard />
+  }
+}
+
 // Layout component for authenticated pages
 const AuthenticatedLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <BreadcrumbProvider>
-      <div className="flex h-screen w-screen overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-        
-        {/* Main content area */}
-        <div className="flex-1 flex flex-col min-w-0 h-full">
-          {/* Header */}
-          <Header onMenuClick={() => setSidebarOpen(true)} />
+    <NavigationProvider>
+      <BreadcrumbProvider>
+        <div className="flex h-screen w-screen overflow-hidden">
+          {/* Sidebar */}
+          <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
           
-          {/* Dashboard content */}
-          <main className="flex-1 bg-gray-100 h-full overflow-hidden">
-            <Dashboard />
-          </main>
+          {/* Main content area */}
+          <div className="flex-1 flex flex-col min-w-0 h-full">
+            {/* Header */}
+            <Header onMenuClick={() => setSidebarOpen(true)} />
+            
+            {/* Page content */}
+            <main className="flex-1 bg-gray-100 h-full overflow-hidden">
+              <PageRenderer />
+            </main>
+          </div>
         </div>
-      </div>
-    </BreadcrumbProvider>
+      </BreadcrumbProvider>
+    </NavigationProvider>
   )
 }
 

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_URL || 'http://vet.clinic',
+  baseURL: import.meta.env.VITE_APP_URL || 'http://vet.api:7000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -52,6 +52,72 @@ export const authAPI = {
   
   getProfile: async () => {
     const response = await api.get('/api/admin/profile')
+    return response.data
+  }
+}
+
+// Pet API functions (updated endpoint from vet-pet to pets)
+export const petAPI = {
+  getAll: async () => {
+    const response = await api.get('/api/pets')
+    return response.data // This returns the Laravel response which might have a 'data' property
+  },
+  
+  create: async (petData) => {
+    const response = await api.post('/api/pets', petData)
+    return response.data
+  },
+  
+  getById: async (id) => {
+    const response = await api.get(`/api/pets/${id}`)
+    return response.data
+  },
+  
+  update: async (id, petData) => {
+    const response = await api.put(`/api/pets/${id}`, petData)
+    return response.data
+  },
+  
+  delete: async (id) => {
+    const response = await api.delete(`/api/pets/${id}`)
+    return response.data
+  }
+}
+
+// Client API functions
+export const clientAPI = {
+  getAll: async () => {
+    const response = await api.get('/api/clients')
+    return response.data
+  },
+  
+  create: async (clientData) => {
+    const response = await api.post('/api/clients', clientData)
+    return response.data
+  },
+  
+  getById: async (id) => {
+    const response = await api.get(`/api/clients/${id}`)
+    return response.data
+  },
+  
+  update: async (id, clientData) => {
+    const response = await api.put(`/api/clients/${id}`, clientData)
+    return response.data
+  },
+  
+  delete: async (id) => {
+    const response = await api.delete(`/api/clients/${id}`)
+    return response.data
+  },
+  
+  assignPet: async (clientId, petId) => {
+    const response = await api.post(`/api/clients/${clientId}/assign-pet`, { pet_id: petId })
+    return response.data
+  },
+  
+  removePet: async (clientId, petId) => {
+    const response = await api.delete(`/api/clients/${clientId}/pets/${petId}`)
     return response.data
   }
 }
