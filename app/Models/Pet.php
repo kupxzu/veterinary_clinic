@@ -28,4 +28,12 @@ class Pet extends Model
     {
         return $this->belongsToMany(\App\Models\Client::class, 'client_pets');
     }
+
+    /**
+     * The vaccination schedules for the pet.
+     */
+    public function vaccinationSchedules()
+    {
+        return $this->belongsToMany(VaccinationSchedule::class, 'vac_pet', 'petid', 'vac_schedid');
+    }
 }

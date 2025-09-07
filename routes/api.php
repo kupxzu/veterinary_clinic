@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\ClientPetsController;
+use App\Http\Controllers\VaccinationScheduleController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -31,3 +32,9 @@ Route::get('pets/species/options', [PetController::class, 'getSpecies']);
 Route::apiResource('clients', ClientPetsController::class);
 Route::post('clients/{client}/assign-pet', [ClientPetsController::class, 'assignPet']);
 Route::delete('clients/{client}/pets/{pet}', [ClientPetsController::class, 'removePet']);
+
+// Vaccination Schedule routes
+Route::apiResource('vaccination-schedules', VaccinationScheduleController::class);
+Route::get('pets/{pet}/vaccinations', [VaccinationScheduleController::class, 'getByPet']);
+Route::post('vaccination-schedules/{vaccination}/attach-pet', [VaccinationScheduleController::class, 'attachPet']);
+Route::delete('vaccination-schedules/{vaccination}/pets/{pet}', [VaccinationScheduleController::class, 'detachPet']);

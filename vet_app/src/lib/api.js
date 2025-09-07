@@ -122,4 +122,47 @@ export const clientAPI = {
   }
 }
 
+// Vaccination Schedule API functions
+export const vaccinationAPI = {
+  getAll: async () => {
+    const response = await api.get('/api/vaccination-schedules')
+    return response.data
+  },
+  
+  create: async (vaccinationData) => {
+    const response = await api.post('/api/vaccination-schedules', vaccinationData)
+    return response.data
+  },
+  
+  getById: async (id) => {
+    const response = await api.get(`/api/vaccination-schedules/${id}`)
+    return response.data
+  },
+  
+  update: async (id, vaccinationData) => {
+    const response = await api.put(`/api/vaccination-schedules/${id}`, vaccinationData)
+    return response.data
+  },
+  
+  delete: async (id) => {
+    const response = await api.delete(`/api/vaccination-schedules/${id}`)
+    return response.data
+  },
+  
+  getByPet: async (petId) => {
+    const response = await api.get(`/api/pets/${petId}/vaccinations`)
+    return response.data
+  },
+  
+  attachPet: async (vaccinationId, petId) => {
+    const response = await api.post(`/api/vaccination-schedules/${vaccinationId}/attach-pet`, { pet_id: petId })
+    return response.data
+  },
+  
+  detachPet: async (vaccinationId, petId) => {
+    const response = await api.delete(`/api/vaccination-schedules/${vaccinationId}/pets/${petId}`)
+    return response.data
+  }
+}
+
 export default api

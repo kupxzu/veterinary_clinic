@@ -9,15 +9,19 @@ import {
   PlusIcon,
   PersonIcon,
   HeartIcon,
-  TrashIcon
+  TrashIcon,
+  CalendarIcon
 } from '@radix-ui/react-icons'
 import { clientAPI } from '../lib/api'
 import PetForm from './PetForm'
+import VaccinationScheduleForm from './VaccinationScheduleForm'
 
 const ClientPets = ({ client, onBack }) => {
   const [pets, setPets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddPetForm, setShowAddPetForm] = useState(false)
+  const [showVaccinationForm, setShowVaccinationForm] = useState(false)
+  const [selectedPet, setSelectedPet] = useState(null)
   const [removingPet, setRemovingPet] = useState(null)
   const { updateBreadcrumbs } = useBreadcrumb()
 
@@ -28,11 +32,30 @@ const ClientPets = ({ client, onBack }) => {
 
   const handleBackToPetsList = useCallback(() => {
     setShowAddPetForm(false)
+    setShowVaccinationForm(false)
+    setSelectedPet(null)
   }, [])
+
+  const handlePetClick = useCallback((pet) => {
+    setSelectedPet(pet)
+    setShowVaccinationForm(true)
+  }, [])
+
+  const handleVaccinationBack = useCallback((destination) => {
+    if (destination === 'pets') {
+      setShowVaccinationForm(false)
+      setSelectedPet(null)
+    } else if (destination === 'clients') {
+      onBack()
+    }
+  }, [onBack])
 
   // Update breadcrumbs when component mounts or showAddPetForm changes
   useEffect(() => {
-    if (showAddPetForm) {
+    if (showVaccinationForm) {
+      // Vaccination form handles its own breadcrumbs
+      return
+    } else if (showAddPetForm) {
       updateBreadcrumbs([
         { label: 'Client Management', onClick: handleBackToClientManagement },
         { label: `${client.fullname}'s Pets`, onClick: handleBackToPetsList },
@@ -45,7 +68,7 @@ const ClientPets = ({ client, onBack }) => {
       ])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client.fullname, showAddPetForm])
+  }, [client.fullname, showAddPetForm, showVaccinationForm])
 
   useEffect(() => {
     fetchData()
@@ -110,6 +133,17 @@ const ClientPets = ({ client, onBack }) => {
         client={client}
         onBack={() => setShowAddPetForm(false)}
         onSuccess={handleAddPetSuccess}
+      />
+    )
+  }
+
+  // If showing vaccination form, render the vaccination form
+  if (showVaccinationForm && selectedPet) {
+    return (
+      <VaccinationScheduleForm
+        pet={selectedPet}
+        client={client}
+        onBack={handleVaccinationBack}
       />
     )
   }
@@ -206,25 +240,31 @@ const ClientPets = ({ client, onBack }) => {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {pets.map((pet) => (
-                <div key={pet.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={pet.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer group" onClick={() => handlePetClick(pet)}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">{getRoleIcon(pet.role)}</span>
                       <h4 className="font-semibold text-gray-900">{pet.name}</h4>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removePet(pet.id)}
-                      disabled={removingPet === pet.id}
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      {removingPet === pet.id ? (
-                        <LoadingSpinner size="sm" />
-                      ) : (
-                        <TrashIcon className="h-3 w-3" />
-                      )}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="h-4 w-4 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          removePet(pet.id)
+                        }}
+                        disabled={removingPet === pet.id}
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        {removingPet === pet.id ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <TrashIcon className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="space-y-2">
@@ -250,6 +290,12 @@ const ClientPets = ({ client, onBack }) => {
                       {pet.colormarking && (
                         <p><strong>Markings:</strong> <span className="text-gray-500">{pet.colormarking.length > 30 ? pet.colormarking.substring(0, 30) + '...' : pet.colormarking}</span></p>
                       )}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2 text-blue-600 text-sm group-hover:text-blue-700 transition-colors">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span>Click to manage vaccination schedule</span>
+                      </div>
                     </div>
                   </div>
                 </div>

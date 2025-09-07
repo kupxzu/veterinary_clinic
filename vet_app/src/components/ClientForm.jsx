@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from './ui/Button'
 import { LoadingSpinner } from './ui/Loading'
+import AddressAutocomplete from './ui/AddressAutocomplete'
 import { clientAPI } from '../lib/api'
 
 const ClientForm = ({ onSuccess, onCancel }) => {
@@ -34,6 +35,13 @@ const ClientForm = ({ onSuccess, onCancel }) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
+    })
+  }
+
+  const handleAddressChange = (address) => {
+    setFormData({
+      ...formData,
+      address: address
     })
   }
 
@@ -114,16 +122,17 @@ const ClientForm = ({ onSuccess, onCancel }) => {
             <label className="text-sm font-semibold text-gray-700">
               Address *
             </label>
-            <textarea
-              name="address"
+            <AddressAutocomplete
               value={formData.address}
-              onChange={handleChange}
-              rows={3}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-              placeholder="Enter complete address"
+              onChange={handleAddressChange}
+              placeholder="Start typing to search for Philippines addresses..."
               disabled={loading}
               required
+              className="w-full"
             />
+            <p className="text-xs text-gray-500">
+              Search by city, province, region, or ZIP code
+            </p>
           </div>
         </div>
 
