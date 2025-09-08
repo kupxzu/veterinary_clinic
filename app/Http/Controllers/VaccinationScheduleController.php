@@ -27,9 +27,8 @@ class VaccinationScheduleController extends Controller
             'date' => 'required|date',
             'weight_killogram' => 'required|numeric|min:0|max:999.99',
             'temperature' => 'required|numeric|min:0|max:999.9',
-            'against' => 'required|string|max:255',
-            'manifacturer' => 'required|string|max:255',
-            'veterenarian' => 'required|string|max:255',
+            'complain_diagnosis' => 'required|string|max:255',
+            'treatment' => 'required|string|max:255',
             'pet_ids' => 'array', // Optional array of pet IDs
             'pet_ids.*' => 'exists:pets,id'
         ]);
@@ -38,9 +37,8 @@ class VaccinationScheduleController extends Controller
             'date' => $validated['date'],
             'weight_killogram' => $validated['weight_killogram'],
             'temperature' => $validated['temperature'],
-            'against' => $validated['against'],
-            'manifacturer' => $validated['manifacturer'],
-            'veterenarian' => $validated['veterenarian']
+            'complain_diagnosis' => $validated['complain_diagnosis'],
+            'treatment' => $validated['treatment']
         ]);
 
         // Attach pets if provided
@@ -71,9 +69,8 @@ class VaccinationScheduleController extends Controller
             'date' => 'sometimes|date',
             'weight_killogram' => 'sometimes|numeric|min:0|max:999.99',
             'temperature' => 'sometimes|numeric|min:0|max:999.9',
-            'against' => 'sometimes|string|max:255',
-            'manifacturer' => 'sometimes|string|max:255',
-            'veterenarian' => 'sometimes|string|max:255',
+            'complain_diagnosis' => 'sometimes|string|max:255',
+            'treatment' => 'sometimes|string|max:255',
             'pet_ids' => 'sometimes|array',
             'pet_ids.*' => 'exists:pets,id'
         ]);

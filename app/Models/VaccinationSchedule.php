@@ -15,13 +15,12 @@ class VaccinationSchedule extends Model
         'date',
         'weight_killogram',
         'temperature',
-        'against',
-        'manifacturer',
-        'veterenarian'
+        'complain_diagnosis',
+        'treatment'
     ];
 
     protected $casts = [
-        'date' => 'date',
+        'date' => 'datetime',
         'weight_killogram' => 'decimal:2',
         'temperature' => 'decimal:1',
     ];

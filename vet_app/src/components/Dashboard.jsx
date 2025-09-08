@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useBreadcrumb } from '../contexts/BreadcrumbContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
+import { LoadingSpinner } from '../components/ui/Loading'
+import { clientAPI, petAPI, vaccinationAPI } from '../lib/api'
 import { 
   HeartIcon, 
   CalendarIcon, 
@@ -17,6 +19,17 @@ import {
 const Dashboard = () => {
   const { user } = useAuth()
   const { updateBreadcrumbs } = useBreadcrumb()
+  
+  // State for real data
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({
+    totalClients: 0,
+    totalPets: 0,
+    todaysAppointments: 0,
+    recentRecords: 0
+  })
+  const [todaysVaccinations, setTodaysVaccinations] = useState([])
+  const [error, setError] = useState(null)
 
   // Set breadcrumbs for Dashboard
   React.useEffect(() => {
@@ -25,88 +38,89 @@ const Dashboard = () => {
     ])
   }, [])
 
-  const stats = [
+  // Fetch real data on component mount
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Fetch all data in parallel
+      const [clientsResponse, petsResponse, vaccinationsResponse] = await Promise.all([
+        clientAPI.getAll(),
+        petAPI.getAll(),
+        vaccinationAPI.getAll()
+      ])
+
+      // Process clients data
+      const clients = Array.isArray(clientsResponse) ? clientsResponse : []
+      
+      // Process pets data
+      const pets = Array.isArray(petsResponse) ? petsResponse : []
+      
+      // Process vaccinations data
+      const vaccinations = Array.isArray(vaccinationsResponse) ? vaccinationsResponse : []
+      
+      // Filter today's vaccinations
+      const today = new Date().toISOString().split('T')[0]
+      const todaysVacs = vaccinations.filter(vac => {
+        const vacDate = new Date(vac.date).toISOString().split('T')[0]
+        return vacDate === today
+      })
+
+      // Calculate stats
+      setStats({
+        totalClients: clients.length,
+        totalPets: pets.length,
+        todaysAppointments: todaysVacs.length, // Using vaccinations as appointments for now
+        recentRecords: vaccinations.length
+      })
+
+      setTodaysVaccinations(todaysVacs)
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      setError('Failed to load dashboard data. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const statsConfig = [
     {
       title: "Total Clients",
-      value: "87",
-      change: "+8%",
+      value: stats.totalClients.toString(),
+      change: "+0%",
       description: "Registered pet owners",
       icon: PersonIcon,
       trend: "up"
     },
     {
       title: "Total Pets",
-      value: "156",
-      change: "+12%",
+      value: stats.totalPets.toString(),
+      change: "+0%",
       description: "Active pet patients",
       icon: HeartIcon,
       trend: "up"
     },
     {
-      title: "Today's Appointments",
-      value: "23",
-      change: "+3",
+      title: "Today's Vaccinations",
+      value: stats.todaysAppointments.toString(),
+      change: "+0",
       description: "Scheduled for today",
       icon: CalendarIcon,
       trend: "up"
     },
     {
-      title: "Recent Records",
-      value: "89",
-      change: "+15%",
-      description: "Updated this week",
+      title: "Total Records",
+      value: stats.recentRecords.toString(),
+      change: "+0%",
+      description: "Vaccination records",
       icon: FileTextIcon,
       trend: "up"
-    }
-  ]
-
-  const quickActions = [
-    {
-      title: "New Appointment",
-      description: "Schedule a new patient visit",
-      icon: CalendarIcon,
-      color: "bg-blue-500"
-    },
-    {
-      title: "Add Patient",
-      description: "Register a new pet patient",
-      icon: PlusIcon,
-      color: "bg-green-500"
-    },
-    {
-      title: "View Records",
-      description: "Browse patient records",
-      icon: FileTextIcon,
-      color: "bg-purple-500"
-    },
-    {
-      title: "Staff Management",
-      description: "Manage clinic staff",
-      icon: PersonIcon,
-      color: "bg-orange-500"
-    }
-  ]
-
-  const recentActivity = [
-    {
-      title: "New appointment scheduled",
-      time: "5 minutes ago",
-      color: "bg-blue-500"
-    },
-    {
-      title: "Patient record updated",
-      time: "12 minutes ago",
-      color: "bg-green-500"
-    },
-    {
-      title: "New staff member added",
-      time: "2 hours ago",
-      color: "bg-orange-500"
-    },
-    {
-      title: "System backup completed",
-      time: "3 hours ago",
-      color: "bg-purple-500"
     }
   ]
 
@@ -124,6 +138,74 @@ const Dashboard = () => {
     }
   }
 
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'Confirmed':
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Confirmed</Badge>
+      case 'Pending':
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>
+      case 'Urgent':
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Urgent</Badge>
+      default:
+        return <Badge variant="secondary">{status}</Badge>
+    }
+  }
+
+  const getPetIcon = (petType) => {
+    if (petType === 'Dog' || petType === 'canine') return '🐕'
+    if (petType === 'Cat' || petType === 'feline') return '🐱'
+    return '🐾'
+  }
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="h-full w-full p-6 space-y-6 overflow-y-auto">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-gray-600">Loading your clinic data...</p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="h-full w-full p-6 space-y-6 overflow-y-auto">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-1 text-gray-600">Welcome back, {user?.name}!</p>
+        </div>
+        <Card className="bg-white shadow">
+          <CardContent className="p-6">
+            <div className="text-center py-12">
+              <div className="text-red-600 mb-4">
+                <ActivityLogIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p className="font-medium">{error}</p>
+              </div>
+              <button
+                onClick={fetchDashboardData}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Try Again
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="h-full w-full p-6 space-y-6 overflow-y-auto">
       {/* Header */}
@@ -136,7 +218,7 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => {
+        {statsConfig.map((stat, index) => {
           const IconComponent = stat.icon
           return (
             <Card key={index} className="bg-white shadow hover:shadow-md transition-shadow">
@@ -164,77 +246,79 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Quick Actions */}
-        <Card className="lg:col-span-2 bg-white shadow">
+      <div className="grid grid-cols-1 gap-6">
+        {/* Today's Medical Schedules */}
+        <Card className="bg-white shadow">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-3 text-xl text-gray-900">
-              <ActivityLogIcon className="h-6 w-6" />
-              <span>Quick Actions</span>
+              <CalendarIcon className="h-6 w-6" />
+              <span>Today's Medical Schedules</span>
+              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </Badge>
             </CardTitle>
             <CardDescription className="text-base text-gray-600">
-              Frequently used clinic management tools
+              Medical schedules for today ({todaysVaccinations.length} total)
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-              {quickActions.map((action, index) => {
-                const IconComponent = action.icon
-                const bgColor = action.color === 'bg-blue-500' ? 'bg-blue-100' : 
-                               action.color === 'bg-green-500' ? 'bg-green-100' :
-                               action.color === 'bg-purple-500' ? 'bg-purple-100' : 'bg-orange-100'
-                const iconColor = action.color === 'bg-blue-500' ? 'text-blue-500' : 
-                                 action.color === 'bg-green-500' ? 'text-green-500' :
-                                 action.color === 'bg-purple-500' ? 'text-purple-500' : 'text-orange-500'
-                return (
+            {todaysVaccinations.length === 0 ? (
+              <div className="text-center py-12">
+                <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No medical schedules for today</h3>
+                <p className="text-gray-600">You have a clear schedule for today.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {todaysVaccinations.map((vaccination, index) => (
                   <div 
-                    key={index} 
-                    className="group cursor-pointer rounded-lg border border-gray-200 p-6 hover:bg-gray-50 transition-colors hover:shadow-md"
+                    key={vaccination.id || index} 
+                    className="group cursor-pointer rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition-colors hover:shadow-md"
                   >
-                    <div className="flex items-start space-x-4">
-                      <div className={`p-3 rounded-lg ${bgColor} group-hover:scale-110 transition-transform`}>
-                        <IconComponent className={`h-5 w-5 ${iconColor}`} />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <span className="text-lg">🏥</span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {formatTime(vaccination.date)}
+                            </p>
+                            <span className="text-gray-300">•</span>
+                            <p className="text-sm font-medium text-gray-700 truncate">
+                              Medical Schedule
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <p className="text-sm text-gray-600">
+                              Diagnosis: <span className="font-medium">{vaccination.complain_diagnosis}</span>
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <span>Weight: {vaccination.weight_killogram}kg</span>
+                            <span>Temp: {vaccination.temperature}°C</span>
+                            <span>Treatment: {vaccination.treatment}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-2 flex-1 min-w-0">
-                        <h4 className="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                          {action.title}
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          {action.description}
-                        </p>
+                      <div className="flex-shrink-0 ml-4">
+                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                          Scheduled
+                        </Badge>
                       </div>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="lg:col-span-1 bg-white shadow">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center space-x-3 text-xl text-gray-900">
-              <ActivityLogIcon className="h-6 w-6" />
-              <span>Recent Activity</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-4">
-                  <div className={`h-3 w-3 rounded-full mt-2 ${activity.color}`}></div>
-                  <div className="space-y-1 flex-1">
-                    <p className="text-sm font-medium leading-tight text-gray-900">
-                      {activity.title}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {activity.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

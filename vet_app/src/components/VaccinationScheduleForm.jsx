@@ -18,9 +18,8 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
     date: '',
     weight_killogram: '',
     temperature: '',
-    against: '',
-    manifacturer: '',
-    veterenarian: '',
+    complain_diagnosis: '',
+    treatment: '',
     pet_ids: [pet.id] // Include the current pet by default
   })
   const [loading, setLoading] = useState(false)
@@ -44,7 +43,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
     updateBreadcrumbs([
       { label: 'Client Management', onClick: handleBackToClients },
       { label: `${client.fullname}'s Pets`, onClick: handleBackToPets },
-      { label: `${pet.name} - Vaccination Schedule`, href: null }
+      { label: `${pet.name} - Medical Schedule`, href: null }
     ])
     
     // Fetch pending schedules for this pet
@@ -77,7 +76,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
     
     // Add validation before sending
     if (!formData.date || !formData.weight_killogram || !formData.temperature || 
-        !formData.against || !formData.manifacturer || !formData.veterenarian) {
+        !formData.complain_diagnosis || !formData.treatment) {
       setError('Please fill in all required fields.')
       setLoading(false)
       return
@@ -96,9 +95,8 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
         date: '',
         weight_killogram: '',
         temperature: '',
-        against: '',
-        manifacturer: '',
-        veterenarian: '',
+        complain_diagnosis: '',
+        treatment: '',
         pet_ids: [pet.id]
       })
 
@@ -182,10 +180,10 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <CalendarIcon className="h-5 w-5" />
-                Vaccination Schedule
+                Medical Schedule
               </CardTitle>
               <CardDescription>
-                Create a vaccination schedule for {pet.name}
+                Create a medical schedule for {pet.name}
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
@@ -223,10 +221,10 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Vaccination Date *
+                  Schedule Date & Time *
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   id="date"
                   name="date"
                   value={formData.date}
@@ -274,52 +272,35 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
               </div>
 
               <div>
-                <label htmlFor="against" className="block text-sm font-medium text-gray-700 mb-2">
-                  Vaccination Against *
+                <label htmlFor="complain_diagnosis" className="block text-sm font-medium text-gray-700 mb-2">
+                  Complaint/Diagnosis *
                 </label>
                 <input
                   type="text"
-                  id="against"
-                  name="against"
-                  value={formData.against}
+                  id="complain_diagnosis"
+                  name="complain_diagnosis"
+                  value={formData.complain_diagnosis}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                  placeholder="e.g., Rabies, Distemper, Parvovirus"
+                  placeholder="e.g., Routine vaccination, Fever, Injury"
                   disabled={loading}
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="manifacturer" className="block text-sm font-medium text-gray-700 mb-2">
-                  Manufacturer *
+                <label htmlFor="treatment" className="block text-sm font-medium text-gray-700 mb-2">
+                  Treatment *
                 </label>
-                <input
-                  type="text"
-                  id="manifacturer"
-                  name="manifacturer"
-                  value={formData.manifacturer}
+                <textarea
+                  id="treatment"
+                  name="treatment"
+                  value={formData.treatment}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                  placeholder="e.g., Pfizer, Merck, Boehringer"
+                  placeholder="e.g., Administered rabies vaccine, Prescribed antibiotics"
                   disabled={loading}
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="veterenarian" className="block text-sm font-medium text-gray-700 mb-2">
-                  Veterinarian *
-                </label>
-                <input
-                  type="text"
-                  id="veterenarian"
-                  name="veterenarian"
-                  value={formData.veterenarian}
-                  onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                  placeholder="e.g., Dr. Juan Cruz"
-                  disabled={loading}
+                  rows={3}
                   required
                 />
               </div>
@@ -339,7 +320,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                 ) : (
                   <>
                     <PlusIcon className="h-4 w-4" />
-                    Create Vaccination Schedule
+                    Create Medical Schedule
                   </>
                 )}
               </Button>
@@ -364,49 +345,45 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
         <CardHeader>
           <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
-            Vaccination History for {pet.name}
+            Medical History for {pet.name}
           </h3>
         </CardHeader>
         <CardContent>
           {loadingSchedules ? (
             <div className="flex justify-center items-center py-8">
               <LoadingSpinner size="md" />
-              <span className="ml-2 text-gray-600">Loading vaccination history...</span>
+              <span className="ml-2 text-gray-600">Loading medical history...</span>
             </div>
           ) : pendingSchedules.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No vaccination schedules found for {pet.name}</p>
-              <p className="text-sm mt-2">Create the first vaccination schedule above.</p>
+              <p>No medical schedules found for {pet.name}</p>
+              <p className="text-sm mt-2">Create the first medical schedule above.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {pendingSchedules.map((schedule, index) => (
                 <div key={schedule.id || index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Date</label>
-                      <p className="text-gray-900">{new Date(schedule.date).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Vaccination Against</label>
-                      <p className="text-gray-900">{schedule.against}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Manufacturer</label>
-                      <p className="text-gray-900">{schedule.manifacturer}</p>
+                      <label className="text-sm font-medium text-gray-700">Date & Time</label>
+                      <p className="text-gray-900">{new Date(schedule.date).toLocaleString()}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-700">Weight (kg)</label>
                       <p className="text-gray-900">{schedule.weight_killogram}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Temperature</label>
-                      <p className="text-gray-900">{schedule.temperature}°C</p>
+                      <label className="text-sm font-medium text-gray-700">Temperature (°C)</label>
+                      <p className="text-gray-900">{schedule.temperature}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Veterinarian</label>
-                      <p className="text-gray-900">{schedule.veterenarian}</p>
+                      <label className="text-sm font-medium text-gray-700">Complaint/Diagnosis</label>
+                      <p className="text-gray-900">{schedule.complain_diagnosis}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-gray-700">Treatment</label>
+                      <p className="text-gray-900">{schedule.treatment}</p>
                     </div>
                   </div>
                 </div>

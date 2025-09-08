@@ -11,6 +11,7 @@ import ClientPets from './ClientPets'
 const ClientManagement = () => {
   const [view, setView] = useState('list') // 'list', 'form', 'pets'
   const [selectedClient, setSelectedClient] = useState(null)
+  const [editingClient, setEditingClient] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const { updateBreadcrumbs } = useBreadcrumb()
 
@@ -23,7 +24,7 @@ const ClientManagement = () => {
     } else if (view === 'form') {
       updateBreadcrumbs([
         { label: 'Client Management', onClick: () => setView('list') },
-        { label: 'Create New Client', href: null }
+        { label: editingClient ? 'Edit Client' : 'Create New Client', href: null }
       ])
     } else if (view === 'pets' && selectedClient) {
       updateBreadcrumbs([
@@ -31,7 +32,7 @@ const ClientManagement = () => {
         { label: `${selectedClient.fullname}'s Pets`, href: null }
       ])
     }
-  }, [view, selectedClient])
+  }, [view, selectedClient, editingClient])
 
   const handleSelectClient = (client) => {
     setSelectedClient(client)
@@ -39,16 +40,30 @@ const ClientManagement = () => {
   }
 
   const handleCreateClient = () => {
+    setEditingClient(null)
     setView('form')
+  }
+
+  const handleEditClient = (client) => {
+    setEditingClient(client)
+    setView('form')
+  }
+
+  const handleDeleteClient = (clientId) => {
+    // Client is already deleted in ClientList component
+    // This callback can be used for any additional cleanup if needed
+    console.log('Client deleted:', clientId)
   }
 
   const handleClientCreated = () => {
     setView('list')
+    setEditingClient(null)
   }
 
   const handleBack = () => {
     setView('list')
     setSelectedClient(null)
+    setEditingClient(null)
   }
 
   if (isLoading) {
@@ -95,7 +110,11 @@ const ClientManagement = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ClientList onSelectClient={handleSelectClient} />
+              <ClientList 
+                onSelectClient={handleSelectClient} 
+                onEditClient={handleEditClient}
+                onDeleteClient={handleDeleteClient}
+              />
             </CardContent>
           </Card>
         </>
@@ -114,9 +133,11 @@ const ClientManagement = () => {
               ← Back
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Add New Client</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {editingClient ? 'Edit Client' : 'Add New Client'}
+              </h1>
               <p className="mt-1 text-gray-600">
-                Create a new client profile to manage their pets
+                {editingClient ? 'Update client information' : 'Create a new client profile to manage their pets'}
               </p>
             </div>
           </div>
@@ -129,11 +150,12 @@ const ClientManagement = () => {
                 Client Information
               </CardTitle>
               <CardDescription className="text-base text-gray-600">
-                Please fill in the client's details below
+                {editingClient ? 'Update the client details below' : 'Please fill in the client\'s details below'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ClientForm
+                client={editingClient}
                 onSuccess={handleClientCreated}
                 onCancel={handleBack}
               />

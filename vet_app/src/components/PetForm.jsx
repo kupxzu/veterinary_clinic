@@ -27,6 +27,92 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
   const [customBreed, setCustomBreed] = useState('')
   const [customSpecies, setCustomSpecies] = useState('')
 
+  // Common breeds for dogs and cats
+  const commonBreeds = {
+    canine: [
+      'Labrador Retriever',
+      'Golden Retriever',
+      'German Shepherd',
+      'Bulldog',
+      'Poodle',
+      'Beagle',
+      'Rottweiler',
+      'Yorkshire Terrier',
+      'Dachshund',
+      'Siberian Husky',
+      'Boxer',
+      'Boston Terrier',
+      'Shih Tzu',
+      'Chihuahua',
+      'Border Collie',
+      'Australian Shepherd',
+      'Cocker Spaniel',
+      'French Bulldog',
+      'Great Dane',
+      'Pomeranian',
+      'Maltese',
+      'Cavalier King Charles Spaniel',
+      'Jack Russell Terrier',
+      'Pug',
+      'Mixed Breed',
+      'others'
+    ],
+    feline: [
+      'Persian',
+      'Maine Coon',
+      'Siamese',
+      'Ragdoll',
+      'British Shorthair',
+      'Abyssinian',
+      'Russian Blue',
+      'American Shorthair',
+      'Scottish Fold',
+      'Sphynx',
+      'Bengal',
+      'Birman',
+      'Oriental Shorthair',
+      'Devon Rex',
+      'Cornish Rex',
+      'Burmese',
+      'Tonkinese',
+      'Norwegian Forest Cat',
+      'Exotic Shorthair',
+      'Turkish Angora',
+      'Munchkin',
+      'Balinese',
+      'Himalayan',
+      'Domestic Shorthair',
+      'Domestic Longhair',
+      'others'
+    ]
+  }
+
+  // Common species for dogs and cats
+  const commonSpecies = {
+    canine: [
+      'Canis lupus familiaris',
+      'Domestic Dog',
+      'Working Dog',
+      'Sporting Dog',
+      'Hound Dog',
+      'Terrier',
+      'Toy Dog',
+      'Non-Sporting Dog',
+      'Herding Dog',
+      'others'
+    ],
+    feline: [
+      'Felis catus',
+      'Domestic Cat',
+      'Shorthair Cat',
+      'Longhair Cat',
+      'Indoor Cat',
+      'Outdoor Cat',
+      'Feral Cat',
+      'others'
+    ]
+  }
+
   // Initialize form data when editing
   useEffect(() => {
     if (pet) {
@@ -50,21 +136,21 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
 
   const fetchBreedOptions = async (role) => {
     try {
-      const response = await fetch(`/api/pets/breeds/options?role=${role}`)
-      const breeds = await response.json()
+      // Use local breed data instead of API call
+      const breeds = commonBreeds[role] || []
       setBreedOptions(breeds)
     } catch (error) {
-      console.error('Error fetching breeds:', error)
+      console.error('Error setting breeds:', error)
     }
   }
 
   const fetchSpeciesOptions = async (role) => {
     try {
-      const response = await fetch(`/api/pets/species/options?role=${role}`)
-      const species = await response.json()
+      // Use local species data instead of API call
+      const species = commonSpecies[role] || []
       setSpeciesOptions(species)
     } catch (error) {
-      console.error('Error fetching species:', error)
+      console.error('Error setting species:', error)
     }
   }
 

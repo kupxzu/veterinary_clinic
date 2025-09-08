@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from './ui/Button'
 import { LoadingSpinner } from './ui/Loading'
 import AddressAutocomplete from './ui/AddressAutocomplete'
 import { clientAPI } from '../lib/api'
 
-const ClientForm = ({ onSuccess, onCancel }) => {
+const ClientForm = ({ client = null, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
@@ -15,17 +15,34 @@ const ClientForm = ({ onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  // Initialize form data when editing
+  useEffect(() => {
+    if (client) {
+      setFormData({
+        fullname: client.fullname || '',
+        email: client.email || '',
+        number: client.number || '',
+        address: client.address || '',
+        age: client.age || ''
+      })
+    }
+  }, [client])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     
     try {
-      await clientAPI.create(formData)
+      if (client) {
+        await clientAPI.update(client.id, formData)
+      } else {
+        await clientAPI.create(formData)
+      }
       onSuccess()
     } catch (error) {
-      console.error('Error creating client:', error)
-      setError(error.response?.data?.message || 'Failed to create client. Please try again.')
+      console.error(`Error ${client ? 'updating' : 'creating'} client:`, error)
+      setError(error.response?.data?.message || `Failed to ${client ? 'update' : 'create'} client. Please try again.`)
     } finally {
       setLoading(false)
     }
@@ -145,10 +162,10 @@ const ClientForm = ({ onSuccess, onCancel }) => {
             {loading ? (
               <div className="flex items-center gap-2">
                 <LoadingSpinner size="sm" />
-                Creating Client...
+                {client ? 'Updating Client...' : 'Creating Client...'}
               </div>
             ) : (
-              'Create Client'
+              client ? 'Update Client' : 'Create Client'
             )}
           </Button>
           <Button 
