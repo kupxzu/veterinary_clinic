@@ -90,26 +90,26 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
   // Common species for dogs and cats
   const commonSpecies = {
     canine: [
-      'Canis lupus familiaris',
-      'Domestic Dog',
-      'Working Dog',
-      'Sporting Dog',
-      'Hound Dog',
-      'Terrier',
-      'Toy Dog',
-      'Non-Sporting Dog',
-      'Herding Dog',
-      'others'
+      // 'Canis lupus familiaris',
+      // 'Domestic Dog',
+      // 'Working Dog',
+      // 'Sporting Dog',
+      // 'Hound Dog',
+      // 'Terrier',
+      // 'Toy Dog',
+      // 'Non-Sporting Dog',
+      // 'Herding Dog',
+      // 'others'
     ],
     feline: [
-      'Felis catus',
-      'Domestic Cat',
-      'Shorthair Cat',
-      'Longhair Cat',
-      'Indoor Cat',
-      'Outdoor Cat',
-      'Feral Cat',
-      'others'
+      // 'Felis catus',
+      // 'Domestic Cat',
+      // 'Shorthair Cat',
+      // 'Longhair Cat',
+      // 'Indoor Cat',
+      // 'Outdoor Cat',
+      // 'Feral Cat',
+      // 'others'
     ]
   }
 
@@ -282,7 +282,7 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-700">
-                  Pet Type *
+                  Pet Species *
                 </label>
                 <select
                   value={formData.role}
@@ -290,8 +290,8 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                   disabled={isLoading}
                 >
-                  <option value="canine">🐕 Canine (Dog)</option>
-                  <option value="feline">🐱 Feline (Cat)</option>
+                  <option value="canine">Canine</option>
+                  <option value="feline">Feline</option>
                 </select>
               </div>
 
@@ -337,7 +337,7 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-700">
-                  Species
+                  Other Species (Optional)
                 </label>
                 {!showCustomSpecies ? (
                   <select
@@ -346,7 +346,7 @@ const PetForm = ({ pet = null, client = null, onBack, onSuccess }) => {
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                     disabled={isLoading}
                   >
-                    <option value="">Select a species</option>
+                    <option value="">.....</option>
                     {speciesOptions.map((species) => (
                       <option key={species} value={species}>{species}</option>
                     ))}
