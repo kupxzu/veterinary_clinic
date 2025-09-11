@@ -9,17 +9,76 @@ import {
   CalendarIcon,
   PersonIcon,
   HeartIcon,
-  PlusIcon
+  PlusIcon,
+  MixerHorizontalIcon,
+  ScissorsIcon,
+  ActivityLogIcon,
+  ArchiveIcon,
+  FileTextIcon,
+  Cross2Icon,
+  Pencil1Icon,
+  CheckIcon,
+  TrashIcon,
+  DotsHorizontalIcon,
+  ChevronDownIcon
 } from '@radix-ui/react-icons'
 import { vaccinationAPI } from '../lib/api'
 
 const VaccinationScheduleForm = ({ pet, client, onBack }) => {
+  // Medical service types configuration
+  const medicalServices = [
+    {
+      id: 'cbc_test',
+      name: 'CBC Test',
+      icon: ActivityLogIcon,
+      color: 'bg-blue-100 text-blue-700 border-blue-200',
+      description: 'Complete Blood Count analysis'
+    },
+    {
+      id: 'groom',
+      name: 'Grooming',
+      icon: ScissorsIcon,
+      color: 'bg-pink-100 text-pink-700 border-pink-200',
+      description: 'Professional pet grooming service'
+    },
+    {
+      id: 'parasite_treatment',
+      name: 'Parasite Treatment',
+      icon: Cross2Icon,
+      color: 'bg-red-100 text-red-700 border-red-200',
+      description: 'Treatment for parasites and infestations'
+    },
+    {
+      id: 'vaccination',
+      name: 'Vaccination',
+      icon: ArchiveIcon,
+      color: 'bg-green-100 text-green-700 border-green-200',
+      description: 'Immunization and vaccine administration'
+    },
+    {
+      id: 'surgery',
+      name: 'Surgery',
+      icon: MixerHorizontalIcon,
+      color: 'bg-orange-100 text-orange-700 border-orange-200',
+      description: 'Surgical procedures and operations'
+    },
+    {
+      id: 'prescription',
+      name: 'Prescription',
+      icon: FileTextIcon,
+      color: 'bg-purple-100 text-purple-700 border-purple-200',
+      description: 'Medication prescription and management'
+    }
+  ]
+
   const [formData, setFormData] = useState({
     date: '',
     weight_killogram: '',
     temperature: '',
     complain_diagnosis: '',
     treatment: '',
+    medical_service_type: 'vaccination', // Default to vaccination
+    follow_up: '', // Add follow-up field
     pet_ids: [pet.id] // Include the current pet by default
   })
   const [loading, setLoading] = useState(false)
@@ -27,6 +86,10 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
   const [success, setSuccess] = useState(false)
   const [pendingSchedules, setPendingSchedules] = useState([])
   const [loadingSchedules, setLoadingSchedules] = useState(true)
+  const [selectedHistoryService, setSelectedHistoryService] = useState(null) // For medical history filtering
+  const [editingSchedule, setEditingSchedule] = useState(null) // For editing mode
+  const [actionLoading, setActionLoading] = useState({}) // Track loading state for individual actions
+  const [openDropdown, setOpenDropdown] = useState(null) // Track which dropdown is open
   const { updateBreadcrumbs } = useBreadcrumb()
 
   // Memoize the breadcrumb handlers to prevent infinite re-renders
@@ -43,7 +106,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
     updateBreadcrumbs([
       { label: 'Client Management', onClick: handleBackToClients },
       { label: `${client.fullname}'s Pets`, onClick: handleBackToPets },
-      { label: `${pet.name} - Medical Schedule`, href: null }
+      { label: `${pet.name} - Medical Record`, href: null }
     ])
     
     // Fetch pending schedules for this pet
@@ -85,10 +148,25 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
     try {
       console.log('Submitting vaccination data:', formData)
       
-      // Use the vaccinationAPI instead of direct fetch
-      const result = await vaccinationAPI.create(formData)
+      // Transform the data to match backend expectations
+      const backendData = {
+        ...formData,
+        service: formData.medical_service_type, // Map frontend field to backend field
+      }
+      delete backendData.medical_service_type // Remove the frontend-only field
       
-      console.log('Vaccination schedule created:', result)
+      console.log('Backend data:', backendData)
+      
+      let result
+      if (editingSchedule) {
+        // Update existing schedule
+        result = await vaccinationAPI.update(editingSchedule.id, backendData)
+        console.log('Vaccination schedule updated:', result)
+      } else {
+        // Create new schedule
+        result = await vaccinationAPI.create(backendData)
+        console.log('Vaccination schedule created:', result)
+      }
       
       setSuccess(true)
       setFormData({
@@ -97,8 +175,11 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
         temperature: '',
         complain_diagnosis: '',
         treatment: '',
+        medical_service_type: 'vaccination',
+        follow_up: '',
         pet_ids: [pet.id]
       })
+      setEditingSchedule(null)
 
       // Refresh pending schedules list
       fetchPendingSchedules()
@@ -115,7 +196,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
       console.error('Error message:', error.message)
       
       // Handle different types of errors
-      let errorMessage = 'Failed to create vaccination schedule. Please try again.'
+      let errorMessage = 'Failed to create medical record. Please try again.'
       
       if (error.response) {
         // Server responded with error status
@@ -148,6 +229,154 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
     }))
   }
 
+  const handleServiceSelect = (serviceId) => {
+    setFormData(prev => ({
+      ...prev,
+      medical_service_type: serviceId
+    }))
+  }
+
+  const getSelectedService = () => {
+    return medicalServices.find(service => service.id === formData.medical_service_type)
+  }
+
+  // Handle dropdown toggle
+  const toggleDropdown = (scheduleId) => {
+    setOpenDropdown(openDropdown === scheduleId ? null : scheduleId)
+  }
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenDropdown(null)
+    }
+    
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
+
+  // Helper function to group schedules by service type
+  const getSchedulesByService = () => {
+    const grouped = {}
+    pendingSchedules.forEach(schedule => {
+      const serviceType = schedule.service || 'vaccination'
+      if (!grouped[serviceType]) {
+        grouped[serviceType] = []
+      }
+      grouped[serviceType].push(schedule)
+    })
+    return grouped
+  }
+
+  // Get available services that have history records
+  const getAvailableHistoryServices = () => {
+    const schedulesByService = getSchedulesByService()
+    return medicalServices.filter(service => 
+      schedulesByService[service.id] && schedulesByService[service.id].length > 0
+    )
+  }
+
+  // Get filtered schedules based on selected service
+  const getFilteredSchedules = () => {
+    if (!selectedHistoryService) {
+      return pendingSchedules
+    }
+    return pendingSchedules.filter(schedule => 
+      (schedule.service || 'vaccination') === selectedHistoryService
+    )
+  }
+
+  // Handle schedule actions
+  const handleEditSchedule = (schedule) => {
+    setEditingSchedule(schedule)
+    // Pre-fill form with existing data
+    setFormData({
+      date: schedule.date ? new Date(schedule.date).toISOString().slice(0, 16) : '',
+      weight_killogram: schedule.weight_killogram || '',
+      temperature: schedule.temperature || '',
+      complain_diagnosis: schedule.complain_diagnosis || '',
+      treatment: schedule.treatment || '',
+      medical_service_type: schedule.service || 'vaccination',
+      follow_up: schedule.follow_up ? new Date(schedule.follow_up).toISOString().slice(0, 16) : '',
+      pet_ids: [pet.id]
+    })
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingSchedule(null)
+    // Reset form
+    setFormData({
+      date: '',
+      weight_killogram: '',
+      temperature: '',
+      complain_diagnosis: '',
+      treatment: '',
+      medical_service_type: 'vaccination',
+      follow_up: '',
+      pet_ids: [pet.id]
+    })
+  }
+
+  const handleCancelSchedule = async (scheduleId) => {
+    setActionLoading(prev => ({ ...prev, [scheduleId]: 'cancelling' }))
+    
+    try {
+      await vaccinationAPI.markCancelled(scheduleId)
+      
+      // Refresh the schedules list
+      await fetchPendingSchedules()
+      
+      setError(null)
+    } catch (error) {
+      console.error('Error cancelling schedule:', error)
+      setError('Failed to cancel the schedule. Please try again.')
+    } finally {
+      setActionLoading(prev => ({ ...prev, [scheduleId]: null }))
+    }
+  }
+
+  const handleCompleteSchedule = async (scheduleId) => {
+    setActionLoading(prev => ({ ...prev, [scheduleId]: 'completing' }))
+    
+    try {
+      await vaccinationAPI.markCompleted(scheduleId)
+      
+      // Refresh the schedules list
+      await fetchPendingSchedules()
+      
+      setError(null)
+    } catch (error) {
+      console.error('Error completing schedule:', error)
+      setError('Failed to complete the schedule. Please try again.')
+    } finally {
+      setActionLoading(prev => ({ ...prev, [scheduleId]: null }))
+    }
+  }
+
+  const handleDeleteSchedule = async (scheduleId) => {
+    if (!window.confirm('Are you sure you want to permanently delete this record? This action cannot be undone.')) {
+      return
+    }
+
+    setActionLoading(prev => ({ ...prev, [scheduleId]: 'deleting' }))
+    
+    try {
+      await vaccinationAPI.delete(scheduleId)
+      
+      // Refresh the schedules list
+      await fetchPendingSchedules()
+      
+      setError(null)
+    } catch (error) {
+      console.error('Error deleting schedule:', error)
+      setError('Failed to delete the schedule. Please try again.')
+    } finally {
+      setActionLoading(prev => ({ ...prev, [scheduleId]: null }))
+    }
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
@@ -159,10 +388,10 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Vaccination Schedule Created Successfully!
+              Medical Record Created Successfully!
             </h3>
             <p className="text-gray-600 mb-4">
-              The vaccination schedule for {pet.name} has been saved.
+              The medical record for {pet.name} has been saved.
             </p>
             <LoadingSpinner size="sm" />
             <p className="text-sm text-gray-500 mt-2">Returning to pets list...</p>
@@ -174,31 +403,36 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarIcon className="h-5 w-5" />
-                Medical Schedule
-              </CardTitle>
-              <CardDescription>
-                Create a medical schedule for {pet.name}
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="flex items-center gap-1">
-                <PersonIcon className="h-3 w-3" />
-                {client.fullname}
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <HeartIcon className="h-3 w-3" />
-                {pet.name}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* Left Column - Medical Record Form */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <CalendarIcon className="h-5 w-5" />
+                      {editingSchedule ? 'Edit Medical Record' : 'Medical Record'}
+                    </CardTitle>
+                    <CardDescription className="mt-1">
+                      {editingSchedule ? `Update medical record for ${pet.name}` : `Create a medical record for ${pet.name}`}
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <PersonIcon className="h-3 w-3" />
+                      {client.fullname}
+                    </Badge>
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <HeartIcon className="h-3 w-3" />
+                      {pet.name}
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <div className="flex">
@@ -217,11 +451,59 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
             </div>
           )}
 
+          {/* Medical Service Selection */}
+          <div className="mb-6">
+            <h3 className="text-base font-medium text-gray-900 mb-3">Select Medical Service Type</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {medicalServices.map((service) => {
+                const IconComponent = service.icon
+                const isSelected = formData.medical_service_type === service.id
+                
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => handleServiceSelect(service.id)}
+                    disabled={loading}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-md ${
+                      isSelected 
+                        ? `${service.color} ring-2 ring-offset-2 ring-blue-500 shadow-md` 
+                        : 'bg-white border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <IconComponent className={`h-6 w-6 ${isSelected ? '' : 'text-gray-600'}`} />
+                      <span className={`font-medium ${isSelected ? '' : 'text-gray-900'}`}>
+                        {service.name}
+                      </span>
+                    </div>
+                    <p className={`text-sm ${isSelected ? 'opacity-90' : 'text-gray-600'}`}>
+                      {service.description}
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+            
+            {/* Selected Service Display */}
+            {formData.medical_service_type && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-blue-900">Selected Service:</span>
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    {React.createElement(getSelectedService()?.icon, { className: "h-3 w-3" })}
+                    {getSelectedService()?.name}
+                  </Badge>
+                </div>
+              </div>
+            )}
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Schedule Date & Time *
+                  Date & Time *
                 </label>
                 <input
                   type="datetime-local"
@@ -288,7 +570,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                 />
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label htmlFor="treatment" className="block text-sm font-medium text-gray-700 mb-2">
                   Treatment *
                 </label>
@@ -304,6 +586,21 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                   required
                 />
               </div>
+
+              <div>
+                <label htmlFor="follow_up" className="block text-sm font-medium text-gray-700 mb-2">
+                  Follow-up Date (Optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  id="follow_up"
+                  name="follow_up"
+                  value={formData.follow_up || ''}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
@@ -315,12 +612,21 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                 {loading ? (
                   <>
                     <LoadingSpinner size="sm" />
-                    Creating Schedule...
+                    {editingSchedule ? 'Updating Record...' : 'Creating Record...'}
                   </>
                 ) : (
                   <>
-                    <PlusIcon className="h-4 w-4" />
-                    Create Medical Schedule
+                    {editingSchedule ? (
+                      <>
+                        <CheckIcon className="h-4 w-4" />
+                        Update Medical Record
+                      </>
+                    ) : (
+                      <>
+                        <PlusIcon className="h-4 w-4" />
+                        Create Medical Record
+                      </>
+                    )}
                   </>
                 )}
               </Button>
@@ -328,22 +634,24 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => onBack('pets')}
+                onClick={editingSchedule ? handleCancelEdit : () => onBack('pets')}
                 disabled={loading}
                 className="flex items-center justify-center gap-2"
               >
                 <ArrowLeftIcon className="h-4 w-4" />
-                Cancel
+                {editingSchedule ? 'Cancel Edit' : 'Cancel'}
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
-
-      {/* Pending Schedules Section */}
-      <Card className="mt-6 max-w-4xl mx-auto">
+    </div>
+    
+    {/* Right Column - Medical History */}
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
-          <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+          <h3 className="text-base font-medium text-gray-900 flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
             Medical History for {pet.name}
           </h3>
@@ -357,42 +665,259 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
           ) : pendingSchedules.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No medical schedules found for {pet.name}</p>
-              <p className="text-sm mt-2">Create the first medical schedule above.</p>
+              <p>No medical records found for {pet.name}</p>
+              <p className="text-sm mt-2">Create the first medical record above.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {pendingSchedules.map((schedule, index) => (
-                <div key={schedule.id || index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Date & Time</label>
-                      <p className="text-gray-900">{new Date(schedule.date).toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Weight (kg)</label>
-                      <p className="text-gray-900">{schedule.weight_killogram}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Temperature (°C)</label>
-                      <p className="text-gray-900">{schedule.temperature}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">Complaint/Diagnosis</label>
-                      <p className="text-gray-900">{schedule.complain_diagnosis}</p>
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="text-sm font-medium text-gray-700">Treatment</label>
-                      <p className="text-gray-900">{schedule.treatment}</p>
+            <div className="space-y-6">
+              {/* Service Filter Cards */}
+              <div>
+                <h4 className="text-base font-medium text-gray-700 mb-4">Filter by Service Type</h4>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {/* All Services Button */}
+                  <button
+                    onClick={() => setSelectedHistoryService(null)}
+                    className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 flex items-center gap-2 text-sm ${
+                      selectedHistoryService === null
+                        ? 'bg-blue-100 text-blue-700 border-blue-200 ring-2 ring-blue-500 ring-offset-1'
+                        : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                    All Records ({pendingSchedules.length})
+                  </button>
+
+                  {/* Individual Service Cards */}
+                  {getAvailableHistoryServices().map((service) => {
+                    const schedulesByService = getSchedulesByService()
+                    const count = schedulesByService[service.id]?.length || 0
+                    const IconComponent = service.icon
+                    const isSelected = selectedHistoryService === service.id
+
+                    return (
+                      <button
+                        key={service.id}
+                        onClick={() => setSelectedHistoryService(service.id)}
+                        className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 flex items-center gap-2 text-sm ${
+                          isSelected
+                            ? `${service.color} ring-2 ring-blue-500 ring-offset-1`
+                            : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <IconComponent className="h-4 w-4" />
+                        {service.name} ({count})
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Filtered Schedule Display */}
+              <div>
+                {selectedHistoryService && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-medium text-blue-900">
+                        Showing {selectedHistoryService.replace('_', ' ')} history:
+                      </span>
+                      <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                        {React.createElement(
+                          medicalServices.find(s => s.id === selectedHistoryService)?.icon, 
+                          { className: "h-4 w-4" }
+                        )}
+                        {getFilteredSchedules().length} record(s)
+                      </Badge>
                     </div>
                   </div>
+                )}
+
+                <div className="space-y-6">
+                  {getFilteredSchedules().map((schedule, index) => {
+                    const serviceType = schedule.service || 'vaccination'
+                    const service = medicalServices.find(s => s.id === serviceType) || medicalServices[3]
+                    const ServiceIcon = service.icon
+                    const currentActionLoading = actionLoading[schedule.id]
+                    const isEditing = editingSchedule?.id === schedule.id
+                    
+                    return (
+                      <div key={schedule.id || index} className={`border-2 rounded-lg p-4 transition-colors ${
+                        isEditing ? 'border-blue-300 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+                      }`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Badge className={`flex items-center gap-1 ${service.color} border px-2 py-1`}>
+                              <ServiceIcon className="h-4 w-4" />
+                              {service.name}
+                            </Badge>
+                            {schedule.status && (
+                              <Badge variant={
+                                schedule.status === 'pending' ? 'secondary' : 
+                                schedule.status === 'completed' ? 'default' : 
+                                schedule.status === 'cancelled' ? 'destructive' :
+                                'secondary'
+                              } className="px-2 py-1">
+                                {schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1)}
+                              </Badge>
+                            )}
+                            <span className="text-sm text-gray-500">
+                              {new Date(schedule.date).toLocaleDateString()}
+                            </span>
+                            {isEditing && (
+                              <Badge variant="outline" className="text-blue-700 border-blue-300">
+                                Currently Editing
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Action Dropdown */}
+                          <div className="relative">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                toggleDropdown(schedule.id)
+                              }}
+                              disabled={!!currentActionLoading}
+                              className="flex items-center gap-1 px-2 py-1"
+                            >
+                              <DotsHorizontalIcon className="h-4 w-4" />
+                            </Button>
+                            
+                            {/* Dropdown Menu */}
+                            {openDropdown === schedule.id && (
+                              <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                                <div className="py-1">
+                                  {schedule.status !== 'cancelled' && schedule.status !== 'completed' && (
+                                    <>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          handleEditSchedule(schedule)
+                                          setOpenDropdown(null)
+                                        }}
+                                        disabled={!!currentActionLoading || isEditing}
+                                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        <Pencil1Icon className="h-4 w-4" />
+                                        Edit Record
+                                      </button>
+                                      
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          handleCompleteSchedule(schedule.id)
+                                          setOpenDropdown(null)
+                                        }}
+                                        disabled={!!currentActionLoading}
+                                        className="w-full text-left px-3 py-2 text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        {currentActionLoading === 'completing' ? (
+                                          <LoadingSpinner size="xs" />
+                                        ) : (
+                                          <CheckIcon className="h-4 w-4" />
+                                        )}
+                                        Mark Complete
+                                      </button>
+                                      
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          handleCancelSchedule(schedule.id)
+                                          setOpenDropdown(null)
+                                        }}
+                                        disabled={!!currentActionLoading}
+                                        className="w-full text-left px-4 py-2 text-sm text-orange-700 hover:bg-orange-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        {currentActionLoading === 'cancelling' ? (
+                                          <LoadingSpinner size="xs" />
+                                        ) : (
+                                          <Cross2Icon className="h-4 w-4" />
+                                        )}
+                                        Cancel Record
+                                      </button>
+                                      
+                                      <hr className="my-1" />
+                                    </>
+                                  )}
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleDeleteSchedule(schedule.id)
+                                      setOpenDropdown(null)
+                                    }}
+                                    disabled={!!currentActionLoading}
+                                    className="w-full text-left px-3 py-2 text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {currentActionLoading === 'deleting' ? (
+                                      <LoadingSpinner size="xs" />
+                                    ) : (
+                                      <TrashIcon className="h-4 w-4" />
+                                    )}
+                                    Delete Record
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="text-base font-medium text-gray-700">Date & Time</label>
+                            <p className="text-gray-900 mt-1">{new Date(schedule.date).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <label className="text-base font-medium text-gray-700">Weight (kg)</label>
+                            <p className="text-gray-900 mt-1">{schedule.weight_killogram}</p>
+                          </div>
+                          <div>
+                            <label className="text-base font-medium text-gray-700">Temperature (°C)</label>
+                            <p className="text-gray-900 mt-1">{schedule.temperature}</p>
+                          </div>
+                          <div>
+                            <label className="text-base font-medium text-gray-700">Complaint/Diagnosis</label>
+                            <p className="text-gray-900 mt-1">{schedule.complain_diagnosis}</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="text-base font-medium text-gray-700">Treatment</label>
+                            <p className="text-gray-900 mt-1">{schedule.treatment}</p>
+                          </div>
+                          {schedule.follow_up && (
+                            <div className="md:col-span-2">
+                              <label className="text-base font-medium text-gray-700">Follow-up Scheduled</label>
+                              <p className="text-gray-900 mt-1">{new Date(schedule.follow_up).toLocaleString()}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              ))}
+
+                {getFilteredSchedules().length === 0 && selectedHistoryService && (
+                  <div className="text-center py-8 text-gray-500">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                      {React.createElement(
+                        medicalServices.find(s => s.id === selectedHistoryService)?.icon, 
+                        { className: "h-8 w-8 text-gray-400" }
+                      )}
+                    </div>
+                    <p>No {selectedHistoryService.replace('_', ' ')} records found for {pet.name}</p>
+                    <p className="text-sm mt-2">Records will appear here when you create them above.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </CardContent>
       </Card>
     </div>
+    
+      </div>
+    </div>
+  </div>
   )
 }
 

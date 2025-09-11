@@ -18,6 +18,27 @@ return new class extends Migration
             // Add new 'treatment' column
             $table->string('treatment')->after('complain_diagnosis');
             
+            // Add service type column with enum values
+            $table->enum('service', [
+                'cbc_test',
+                'groom', 
+                'parasite_treatment',
+                'vaccination',
+                'surgery',
+                'prescription'
+            ])->default('vaccination')->after('treatment');
+            
+            // Add follow_up column for follow-up schedules
+            $table->datetime('follow_up')->nullable()->after('service');
+            
+            // Add status column
+            $table->enum('status', [
+                'pending',
+                'completed',
+                'cancelled',
+                'in_progress'
+            ])->default('pending')->after('follow_up');
+            
             // Change 'date' column to datetime to include time
             $table->datetime('date')->change();
             
@@ -35,8 +56,8 @@ return new class extends Migration
             // Revert 'complain_diagnosis' back to 'against'
             $table->renameColumn('complain_diagnosis', 'against');
             
-            // Drop 'treatment' column
-            $table->dropColumn('treatment');
+            // Drop new columns
+            $table->dropColumn(['treatment', 'service', 'follow_up', 'status']);
             
             // Change 'date' column back to date only
             $table->date('date')->change();
