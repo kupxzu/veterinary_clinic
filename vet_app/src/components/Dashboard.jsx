@@ -49,10 +49,11 @@ const Dashboard = () => {
       setError(null)
 
       // Fetch all data in parallel
-      const [clientsResponse, petsResponse, vaccinationsResponse] = await Promise.all([
+      const [clientsResponse, petsResponse, vaccinationsResponse, todaysSchedulesResponse] = await Promise.all([
         clientAPI.getAll(),
         petAPI.getAll(),
-        vaccinationAPI.getAll()
+        vaccinationAPI.getAll(),
+        vaccinationAPI.getTodaysSchedules()
       ])
 
       // Process clients data
@@ -64,22 +65,18 @@ const Dashboard = () => {
       // Process vaccinations data
       const vaccinations = Array.isArray(vaccinationsResponse) ? vaccinationsResponse : []
       
-      // Filter today's vaccinations
-      const today = new Date().toISOString().split('T')[0]
-      const todaysVacs = vaccinations.filter(vac => {
-        const vacDate = new Date(vac.date).toISOString().split('T')[0]
-        return vacDate === today
-      })
+      // Process today's schedules with client info
+      const todaysSchedules = Array.isArray(todaysSchedulesResponse) ? todaysSchedulesResponse : []
 
       // Calculate stats
       setStats({
         totalClients: clients.length,
         totalPets: pets.length,
-        todaysAppointments: todaysVacs.length, // Using vaccinations as appointments for now
+        todaysAppointments: todaysSchedules.length,
         recentRecords: vaccinations.length
       })
 
-      setTodaysVaccinations(todaysVacs)
+      setTodaysVaccinations(todaysSchedules)
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -297,6 +294,33 @@ const Dashboard = () => {
                               Medical Schedule
                             </p>
                           </div>
+                          
+                          {/* Client Information */}
+                          {vaccination.pets && vaccination.pets.length > 0 && (
+                            <div className="mb-2">
+                              {vaccination.pets.map((pet, petIndex) => (
+                                <div key={petIndex} className="mb-1">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <span className="text-sm font-medium text-blue-600">
+                                      Pet: {pet.name} ({pet.breed})
+                                    </span>
+                                  </div>
+                                  {pet.clients && pet.clients.length > 0 && (
+                                    <div className="text-sm text-gray-600">
+                                      {pet.clients.map((client, clientIndex) => (
+                                        <div key={clientIndex} className="flex items-center space-x-4">
+                                          <span className="font-medium">{client.fullname}</span>
+                                          <span>{client.email}</span>
+                                          <span>{client.number}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
                           <div className="flex items-center space-x-2 mb-1">
                             <p className="text-sm text-gray-600">
                               Diagnosis: <span className="font-medium">{vaccination.complain_diagnosis}</span>

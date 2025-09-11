@@ -35,6 +35,16 @@ Route::delete('clients/{client}/pets/{pet}', [ClientPetsController::class, 'remo
 
 // Vaccination Schedule routes
 Route::apiResource('vaccination-schedules', VaccinationScheduleController::class);
+Route::get('vaccination-schedules/todays/schedules', [VaccinationScheduleController::class, 'getTodaysSchedules']);
 Route::get('pets/{pet}/vaccinations', [VaccinationScheduleController::class, 'getByPet']);
 Route::post('vaccination-schedules/{vaccination}/attach-pet', [VaccinationScheduleController::class, 'attachPet']);
 Route::delete('vaccination-schedules/{vaccination}/pets/{pet}', [VaccinationScheduleController::class, 'detachPet']);
+
+// New medical service routes
+Route::get('vaccination-schedules/options/services', [VaccinationScheduleController::class, 'getServiceTypes']);
+Route::get('vaccination-schedules/options/statuses', [VaccinationScheduleController::class, 'getStatusOptions']);
+Route::get('vaccination-schedules/service/{serviceType}', [VaccinationScheduleController::class, 'getByService']);
+Route::get('vaccination-schedules/status/{status}', [VaccinationScheduleController::class, 'getByStatus']);
+Route::get('vaccination-schedules/follow-ups/upcoming', [VaccinationScheduleController::class, 'getUpcomingFollowUps']);
+Route::patch('vaccination-schedules/{id}/mark-completed', [VaccinationScheduleController::class, 'markCompleted']);
+Route::patch('vaccination-schedules/{id}/mark-cancelled', [VaccinationScheduleController::class, 'markCancelled']);

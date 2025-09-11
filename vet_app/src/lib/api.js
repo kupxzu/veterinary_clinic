@@ -129,6 +129,11 @@ export const vaccinationAPI = {
     return response.data
   },
   
+  getTodaysSchedules: async () => {
+    const response = await api.get('/api/vaccination-schedules/todays/schedules')
+    return response.data
+  },
+  
   create: async (vaccinationData) => {
     const response = await api.post('/api/vaccination-schedules', vaccinationData)
     return response.data
@@ -161,6 +166,42 @@ export const vaccinationAPI = {
   
   detachPet: async (vaccinationId, petId) => {
     const response = await api.delete(`/api/vaccination-schedules/${vaccinationId}/pets/${petId}`)
+    return response.data
+  },
+
+  // New medical service methods
+  getServiceTypes: async () => {
+    const response = await api.get('/api/vaccination-schedules/options/services')
+    return response.data
+  },
+
+  getStatusOptions: async () => {
+    const response = await api.get('/api/vaccination-schedules/options/statuses')
+    return response.data
+  },
+
+  getByService: async (serviceType) => {
+    const response = await api.get(`/api/vaccination-schedules/service/${serviceType}`)
+    return response.data
+  },
+
+  getByStatus: async (status) => {
+    const response = await api.get(`/api/vaccination-schedules/status/${status}`)
+    return response.data
+  },
+
+  getUpcomingFollowUps: async () => {
+    const response = await api.get('/api/vaccination-schedules/follow-ups/upcoming')
+    return response.data
+  },
+
+  markCompleted: async (id) => {
+    const response = await api.patch(`/api/vaccination-schedules/${id}/mark-completed`)
+    return response.data
+  },
+
+  markCancelled: async (id) => {
+    const response = await api.patch(`/api/vaccination-schedules/${id}/mark-cancelled`)
     return response.data
   }
 }
