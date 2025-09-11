@@ -34,37 +34,37 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       current: currentPage === 'Dashboard',
       breadcrumb: [{ label: 'Dashboard', href: null }]
     },
-    {
-      name: 'Patients',
-      icon: HeartIcon,
-      href: '#',
-      current: currentPage === 'Patients',
-      count: '1,234',
-      breadcrumb: [{ label: 'Patients', href: null }]
-    },
-    {
-      name: 'Appointments',
-      icon: CalendarIcon,
-      href: '#',
-      current: currentPage === 'Appointments',
-      count: '23',
-      breadcrumb: [{ label: 'Appointments', href: null }]
-    },
-    {
-      name: 'Medical Records',
-      icon: FileTextIcon,
-      href: '#',
-      current: currentPage === 'Medical Records',
-      breadcrumb: [{ label: 'Medical Records', href: null }]
-    },
-    {
-      name: 'Staff',
-      icon: PersonIcon,
-      href: '#',
-      current: currentPage === 'Staff',
-      count: '12',
-      breadcrumb: [{ label: 'Staff', href: null }]
-    },
+    // {
+    //   name: 'Patients',
+    //   icon: HeartIcon,
+    //   href: '#',
+    //   current: currentPage === 'Patients',
+    //   count: '1,234',
+    //   breadcrumb: [{ label: 'Patients', href: null }]
+    // },
+    // {
+    //   name: 'Appointments',
+    //   icon: CalendarIcon,
+    //   href: '#',
+    //   current: currentPage === 'Appointments',
+    //   count: '23',
+    //   breadcrumb: [{ label: 'Appointments', href: null }]
+    // },
+    // {
+    //   name: 'Medical Records',
+    //   icon: FileTextIcon,
+    //   href: '#',
+    //   current: currentPage === 'Medical Records',
+    //   breadcrumb: [{ label: 'Medical Records', href: null }]
+    // },
+    // {
+    //   name: 'Staff',
+    //   icon: PersonIcon,
+    //   href: '#',
+    //   current: currentPage === 'Staff',
+    //   count: '12',
+    //   breadcrumb: [{ label: 'Staff', href: null }]
+    // },
     {
       name: 'Clients',
       icon: PersonIcon,
@@ -72,20 +72,20 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       current: currentPage === 'Clients',
       breadcrumb: [{ label: 'Clients', href: null }]
     },
-    {
-      name: 'Reports',
-      icon: BarChartIcon,
-      href: '#',
-      current: currentPage === 'Reports',
-      breadcrumb: [{ label: 'Reports', href: null }]
-    },
-    {
-      name: 'Activity Log',
-      icon: ActivityLogIcon,
-      href: '#',
-      current: currentPage === 'Activity Log',
-      breadcrumb: [{ label: 'Activity Log', href: null }]
-    }
+    // {
+    //   name: 'Reports',
+    //   icon: BarChartIcon,
+    //   href: '#',
+    //   current: currentPage === 'Reports',
+    //   breadcrumb: [{ label: 'Reports', href: null }]
+    // },
+    // {
+    //   name: 'Activity Log',
+    //   icon: ActivityLogIcon,
+    //   href: '#',
+    //   current: currentPage === 'Activity Log',
+    //   breadcrumb: [{ label: 'Activity Log', href: null }]
+    // }
   ]
 
   const handleNavigation = (item) => {
@@ -120,7 +120,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-2">
-              <svg
+              {/* <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -132,8 +132,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               >
                 <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 5.16-1 9-5.45 9-11V7l-10-5z" />
                 <path d="M9 12l2 2 4-4" />
-              </svg>
-              <span className="font-bold text-lg">VetClinic Pro</span>
+              </svg> */}
+              <span className="font-bold text-cyan-600 text-2xl" style={{ fontFamily: 'Showcard Gothic, sans-serif' }}>SNIFFS & LICKS</span>
             </div>
             <Button
               variant="ghost"
