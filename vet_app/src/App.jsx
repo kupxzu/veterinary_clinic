@@ -46,7 +46,7 @@ const AuthenticatedLayout = () => {
   return (
     <NavigationProvider>
       <BreadcrumbProvider>
-        <div className="flex h-screen w-screen overflow-hidden">
+        <div className="flex h-screen w-screen overflow-hidden bg-background">
           {/* Sidebar */}
           <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
           
@@ -56,7 +56,7 @@ const AuthenticatedLayout = () => {
             <Header onMenuClick={() => setSidebarOpen(true)} />
             
             {/* Page content */}
-            <main className="flex-1 bg-gray-100 h-full overflow-hidden">
+            <main className="flex-1 bg-gray-100 dark:bg-gray-900 h-full overflow-hidden">
               <PageRenderer />
             </main>
           </div>
@@ -100,7 +100,7 @@ function AppContent() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden">
+    <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
       {!isAuthenticated ? (
         <Login />
       ) : (

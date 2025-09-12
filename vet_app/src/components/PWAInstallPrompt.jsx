@@ -53,7 +53,16 @@ function PWAInstallPrompt() {
       alignItems: 'center',
       gap: '12px'
     }}>
-      <span>📱 Install this app for better experience!</span>
+      <img 
+        src="/logo2.png" 
+        alt="Sniffs & Licks" 
+        style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '4px'
+        }}
+      />
+      <span>Install Sniffs & Licks for better experience!</span>
       <button
         onClick={handleInstallClick}
         style={{

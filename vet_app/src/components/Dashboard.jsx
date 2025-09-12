@@ -348,7 +348,7 @@ const Dashboard = () => {
       </div>
 
       {/* PWA Status */}
-      <Card className="bg-white shadow">
+      {/* <Card className="bg-white shadow">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center space-x-3 text-xl text-gray-900">
             <svg
@@ -396,7 +396,7 @@ const Dashboard = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   )
 }

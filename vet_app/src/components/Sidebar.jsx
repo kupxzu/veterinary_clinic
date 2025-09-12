@@ -3,6 +3,8 @@ import { Button } from './ui/Button'
 import { Separator } from './ui/Separator'
 import { Badge } from './ui/Badge'
 import { Avatar, AvatarFallback } from './ui/Avatar'
+import SettingsModal from './SettingsModal'
+import Logo2 from '../assets/logos/Logo2'
 import { useAuth } from '../contexts/AuthContext'
 import { useBreadcrumb } from '../contexts/BreadcrumbContext'
 import { useNavigation } from '../contexts/NavigationContext'
@@ -25,6 +27,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   const { user, logout } = useAuth()
   const { updateBreadcrumbs } = useBreadcrumb()
   const { currentPage, navigateTo } = useNavigation()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const navigation = [
     {
@@ -112,7 +115,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-64 bg-card dark:bg-card border-r dark:border-gray-700 transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:inset-0
       `}>
@@ -120,20 +123,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-2">
-              {/* <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6 text-primary"
-              >
-                <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 5.16-1 9-5.45 9-11V7l-10-5z" />
-                <path d="M9 12l2 2 4-4" />
-              </svg> */}
-              <span className="font-bold text-cyan-600 text-2xl" style={{ fontFamily: 'Showcard Gothic, sans-serif' }}>SNIFFS & LICKS</span>
+              <Logo2 variant="text" className="h-8 w-auto" />
             </div>
             <Button
               variant="ghost"
@@ -149,15 +139,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
           {/* User Info */}
           <div className="px-4 py-4">
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
+            <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
               <Avatar className="h-10 w-10">
                 <AvatarFallback className="text-sm font-semibold bg-primary text-primary-foreground">
                   {getInitials(user?.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.name}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                 <Badge variant="secondary" className="mt-1 text-xs">Administrator</Badge>
               </div>
             </div>
@@ -177,7 +167,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
                     w-full group flex items-center justify-between px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200
                     ${item.current 
                       ? 'bg-primary text-primary-foreground shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                     }
                   `}
                 >
@@ -201,11 +191,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <Separator />
 
           {/* Footer */}
-          <div className="p-4 space-y-3 border-t border-gray-200">
+          <div className="p-4 space-y-3 border-t border-gray-200 dark:border-gray-700">
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-start text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={() => setIsSettingsOpen(true)}
             >
               <GearIcon className="mr-3 h-4 w-4" />
               Settings
@@ -213,7 +204,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-start text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
               onClick={logout}
             >
               <ExitIcon className="mr-3 h-4 w-4" />
@@ -221,6 +212,12 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             </Button>
           </div>
         </div>
+
+        {/* Settings Modal */}
+        <SettingsModal 
+          isOpen={isSettingsOpen} 
+          onClose={() => setIsSettingsOpen(false)} 
+        />
       </div>
     </>
   )

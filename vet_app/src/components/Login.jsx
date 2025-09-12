@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Separator } from '../components/ui/Separator'
 import { Badge } from '../components/ui/Badge'
 import { EyeOpenIcon, EyeClosedIcon } from '@radix-ui/react-icons'
+import MainLogo from '../assets/logos/MainLogo'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -44,29 +45,15 @@ const Login = () => {
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white-600 to-white-900" />
         <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M12 2L2 7v10c0 5.55 3.84 10 9 11 5.16-1 9-5.45 9-11V7l-10-5z" />
-            <path d="M9 12l2 2 4-4" />
-          </svg>
-          VetClinic Pro
+          <MainLogo className="h-16 w-auto" showText={true} />
         </div>
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              "Comprehensive veterinary management system that helps streamline operations and improve patient care."
             </p>
-            <footer className="text-sm">Dr. Sarah Johnson, Chief Veterinarian</footer>
+            <footer className="text-sm text-black">Dr. Ian Jay Vicente, Veterinarian</footer>
           </blockquote>
         </div>
       </div>

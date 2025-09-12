@@ -412,20 +412,20 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <CalendarIcon className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-gray-900">
+                      <CalendarIcon className="h-5 w-5 text-blue-600" />
                       {editingSchedule ? 'Edit Medical Record' : 'Medical Record'}
                     </CardTitle>
-                    <CardDescription className="mt-1">
+                    <CardDescription className="mt-1 text-gray-600">
                       {editingSchedule ? `Update medical record for ${pet.name}` : `Create a medical record for ${pet.name}`}
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge variant="outline" className="flex items-center gap-1 text-blue-700 border-blue-200">
                       <PersonIcon className="h-3 w-3" />
                       {client.fullname}
                     </Badge>
-                    <Badge variant="secondary" className="flex items-center gap-1">
+                    <Badge variant="secondary" className="flex items-center gap-1 text-green-700 bg-green-100 border-green-200">
                       <HeartIcon className="h-3 w-3" />
                       {pet.name}
                     </Badge>
@@ -490,7 +490,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-blue-900">Selected Service:</span>
-                  <Badge variant="secondary" className="flex items-center gap-1">
+                  <Badge variant="secondary" className="flex items-center gap-1 text-blue-700 bg-blue-100 border-blue-200">
                     {React.createElement(getSelectedService()?.icon, { className: "h-3 w-3" })}
                     {getSelectedService()?.name}
                   </Badge>
@@ -503,7 +503,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Date & Time *
+                  Date & Time <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
@@ -511,7 +511,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                   name="date"
                   value={formData.date}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                   disabled={loading}
                   required
                 />
@@ -519,7 +519,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
 
               <div>
                 <label htmlFor="weight_killogram" className="block text-sm font-medium text-gray-700 mb-2">
-                  Weight (kg) *
+                  Weight (kg) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -528,7 +528,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                   name="weight_killogram"
                   value={formData.weight_killogram}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                   placeholder="e.g., 5.2"
                   disabled={loading}
                   required
@@ -537,7 +537,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
 
               <div>
                 <label htmlFor="temperature" className="block text-sm font-medium text-gray-700 mb-2">
-                  Temperature (°C) *
+                  Temperature (°C) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -546,7 +546,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                   name="temperature"
                   value={formData.temperature}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                   placeholder="e.g., 38.5"
                   disabled={loading}
                   required
@@ -555,7 +555,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
 
               <div>
                 <label htmlFor="complain_diagnosis" className="block text-sm font-medium text-gray-700 mb-2">
-                  Complaint/Diagnosis *
+                  Complaint/Diagnosis <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -563,7 +563,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                   name="complain_diagnosis"
                   value={formData.complain_diagnosis}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                   placeholder="e.g., Routine vaccination, Fever, Injury"
                   disabled={loading}
                   required
@@ -572,14 +572,14 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
 
               <div className="md:col-span-2">
                 <label htmlFor="treatment" className="block text-sm font-medium text-gray-700 mb-2">
-                  Treatment *
+                  Treatment <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="treatment"
                   name="treatment"
                   value={formData.treatment}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                   placeholder="e.g., Administered rabies vaccine, Prescribed antibiotics"
                   disabled={loading}
                   rows={3}
@@ -589,7 +589,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
 
               <div>
                 <label htmlFor="follow_up" className="block text-sm font-medium text-gray-700 mb-2">
-                  Follow-up Date (Optional)
+                  Follow-up Date <span className="text-gray-500 text-xs">(Optional)</span>
                 </label>
                 <input
                   type="datetime-local"
@@ -597,7 +597,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                   name="follow_up"
                   value={formData.follow_up || ''}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                   disabled={loading}
                 />
               </div>
@@ -612,19 +612,21 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                 {loading ? (
                   <>
                     <LoadingSpinner size="sm" />
-                    {editingSchedule ? 'Updating Record...' : 'Creating Record...'}
+                    <span className="text-white">
+                      {editingSchedule ? 'Updating Record...' : 'Creating Record...'}
+                    </span>
                   </>
                 ) : (
                   <>
                     {editingSchedule ? (
                       <>
                         <CheckIcon className="h-4 w-4" />
-                        Update Medical Record
+                        <span className="text-white">Update Medical Record</span>
                       </>
                     ) : (
                       <>
                         <PlusIcon className="h-4 w-4" />
-                        Create Medical Record
+                        <span className="text-white">Create Medical Record</span>
                       </>
                     )}
                   </>
@@ -636,10 +638,10 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                 variant="outline" 
                 onClick={editingSchedule ? handleCancelEdit : () => onBack('pets')}
                 disabled={loading}
-                className="flex items-center justify-center gap-2"
+                className="flex items-center justify-center gap-2 text-gray-700 border-gray-300 hover:bg-gray-50"
               >
                 <ArrowLeftIcon className="h-4 w-4" />
-                {editingSchedule ? 'Cancel Edit' : 'Cancel'}
+                <span>{editingSchedule ? 'Cancel Edit' : 'Cancel'}</span>
               </Button>
             </div>
           </form>
@@ -652,8 +654,8 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
       <Card>
         <CardHeader>
           <h3 className="text-base font-medium text-gray-900 flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5" />
-            Medical History for {pet.name}
+            <CalendarIcon className="h-5 w-5 text-blue-600" />
+            Medical History for <span className="text-green-700">{pet.name}</span>
           </h3>
         </CardHeader>
         <CardContent>
@@ -665,8 +667,8 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
           ) : pendingSchedules.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No medical records found for {pet.name}</p>
-              <p className="text-sm mt-2">Create the first medical record above.</p>
+              <p className="text-gray-600">No medical records found for <span className="font-medium text-gray-900">{pet.name}</span></p>
+              <p className="text-sm mt-2 text-gray-500">Create the first medical record above.</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -680,11 +682,11 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                     className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 flex items-center gap-2 text-sm ${
                       selectedHistoryService === null
                         ? 'bg-blue-100 text-blue-700 border-blue-200 ring-2 ring-blue-500 ring-offset-1'
-                        : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                        : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
                     <CalendarIcon className="h-4 w-4" />
-                    All Records ({pendingSchedules.length})
+                    <span className="font-medium">All Records ({pendingSchedules.length})</span>
                   </button>
 
                   {/* Individual Service Cards */}
@@ -700,12 +702,12 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                         onClick={() => setSelectedHistoryService(service.id)}
                         className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 flex items-center gap-2 text-sm ${
                           isSelected
-                            ? `${service.color} ring-2 ring-blue-500 ring-offset-1`
-                            : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                            ? `${service.color} ring-2 ring-blue-500 ring-offset-1 font-medium`
+                            : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
                         <IconComponent className="h-4 w-4" />
-                        {service.name} ({count})
+                        <span className="font-medium">{service.name} ({count})</span>
                       </button>
                     )
                   })}
@@ -720,12 +722,12 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                       <span className="text-base font-medium text-blue-900">
                         Showing {selectedHistoryService.replace('_', ' ')} history:
                       </span>
-                      <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                      <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1 text-blue-700 bg-blue-100 border-blue-200">
                         {React.createElement(
                           medicalServices.find(s => s.id === selectedHistoryService)?.icon, 
                           { className: "h-4 w-4" }
                         )}
-                        {getFilteredSchedules().length} record(s)
+                        <span className="font-medium">{getFilteredSchedules().length} record(s)</span>
                       </Badge>
                     </div>
                   </div>
@@ -745,7 +747,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                       }`}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <Badge className={`flex items-center gap-1 ${service.color} border px-2 py-1`}>
+                            <Badge className={`flex items-center gap-1 ${service.color} border px-2 py-1 font-medium`}>
                               <ServiceIcon className="h-4 w-4" />
                               {service.name}
                             </Badge>
@@ -755,15 +757,20 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                                 schedule.status === 'completed' ? 'default' : 
                                 schedule.status === 'cancelled' ? 'destructive' :
                                 'secondary'
-                              } className="px-2 py-1">
+                              } className={`px-2 py-1 font-medium ${
+                                schedule.status === 'pending' ? 'text-yellow-700 bg-yellow-100 border-yellow-200' :
+                                schedule.status === 'completed' ? 'text-green-700 bg-green-100 border-green-200' :
+                                schedule.status === 'cancelled' ? 'text-red-700 bg-red-100 border-red-200' :
+                                'text-gray-700 bg-gray-100 border-gray-200'
+                              }`}>
                                 {schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1)}
                               </Badge>
                             )}
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-600 font-medium">
                               {new Date(schedule.date).toLocaleDateString()}
                             </span>
                             {isEditing && (
-                              <Badge variant="outline" className="text-blue-700 border-blue-300">
+                              <Badge variant="outline" className="text-blue-700 border-blue-300 bg-blue-50 font-medium">
                                 Currently Editing
                               </Badge>
                             )}
@@ -779,7 +786,7 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                                 toggleDropdown(schedule.id)
                               }}
                               disabled={!!currentActionLoading}
-                              className="flex items-center gap-1 px-2 py-1"
+                              className="flex items-center gap-1 px-2 py-1 text-gray-600 hover:text-gray-900 border-gray-300 hover:border-gray-400"
                             >
                               <DotsHorizontalIcon className="h-4 w-4" />
                             </Button>
@@ -797,10 +804,10 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                                           setOpenDropdown(null)
                                         }}
                                         disabled={!!currentActionLoading || isEditing}
-                                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
-                                        <Pencil1Icon className="h-4 w-4" />
-                                        Edit Record
+                                        <Pencil1Icon className="h-4 w-4 text-blue-600" />
+                                        <span className="font-medium">Edit Record</span>
                                       </button>
                                       
                                       <button
@@ -810,14 +817,14 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                                           setOpenDropdown(null)
                                         }}
                                         disabled={!!currentActionLoading}
-                                        className="w-full text-left px-3 py-2 text-sm text-green-700 hover:bg-green-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full text-left px-3 py-2 text-sm text-green-700 hover:bg-green-50 hover:text-green-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
                                         {currentActionLoading === 'completing' ? (
                                           <LoadingSpinner size="xs" />
                                         ) : (
                                           <CheckIcon className="h-4 w-4" />
                                         )}
-                                        Mark Complete
+                                        <span className="font-medium">Mark Complete</span>
                                       </button>
                                       
                                       <button
@@ -827,14 +834,14 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                                           setOpenDropdown(null)
                                         }}
                                         disabled={!!currentActionLoading}
-                                        className="w-full text-left px-4 py-2 text-sm text-orange-700 hover:bg-orange-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full text-left px-3 py-2 text-sm text-orange-700 hover:bg-orange-50 hover:text-orange-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
                                         {currentActionLoading === 'cancelling' ? (
                                           <LoadingSpinner size="xs" />
                                         ) : (
                                           <Cross2Icon className="h-4 w-4" />
                                         )}
-                                        Cancel Record
+                                        <span className="font-medium">Cancel Record</span>
                                       </button>
                                       
                                       <hr className="my-1" />
@@ -848,14 +855,14 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                                       setOpenDropdown(null)
                                     }}
                                     disabled={!!currentActionLoading}
-                                    className="w-full text-left px-3 py-2 text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full text-left px-3 py-2 text-sm text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {currentActionLoading === 'deleting' ? (
                                       <LoadingSpinner size="xs" />
                                     ) : (
                                       <TrashIcon className="h-4 w-4" />
                                     )}
-                                    Delete Record
+                                    <span className="font-medium">Delete Record</span>
                                   </button>
                                 </div>
                               </div>
@@ -865,29 +872,29 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
-                            <label className="text-base font-medium text-gray-700">Date & Time</label>
-                            <p className="text-gray-900 mt-1">{new Date(schedule.date).toLocaleString()}</p>
+                            <label className="text-sm font-medium text-gray-700">Date & Time</label>
+                            <p className="text-gray-900 mt-1 font-medium">{new Date(schedule.date).toLocaleString()}</p>
                           </div>
                           <div>
-                            <label className="text-base font-medium text-gray-700">Weight (kg)</label>
-                            <p className="text-gray-900 mt-1">{schedule.weight_killogram}</p>
+                            <label className="text-sm font-medium text-gray-700">Weight (kg)</label>
+                            <p className="text-gray-900 mt-1 font-medium">{schedule.weight_killogram}</p>
                           </div>
                           <div>
-                            <label className="text-base font-medium text-gray-700">Temperature (°C)</label>
-                            <p className="text-gray-900 mt-1">{schedule.temperature}</p>
+                            <label className="text-sm font-medium text-gray-700">Temperature (°C)</label>
+                            <p className="text-gray-900 mt-1 font-medium">{schedule.temperature}</p>
                           </div>
                           <div>
-                            <label className="text-base font-medium text-gray-700">Complaint/Diagnosis</label>
+                            <label className="text-sm font-medium text-gray-700">Complaint/Diagnosis</label>
                             <p className="text-gray-900 mt-1">{schedule.complain_diagnosis}</p>
                           </div>
                           <div className="md:col-span-2">
-                            <label className="text-base font-medium text-gray-700">Treatment</label>
+                            <label className="text-sm font-medium text-gray-700">Treatment</label>
                             <p className="text-gray-900 mt-1">{schedule.treatment}</p>
                           </div>
                           {schedule.follow_up && (
                             <div className="md:col-span-2">
-                              <label className="text-base font-medium text-gray-700">Follow-up Scheduled</label>
-                              <p className="text-gray-900 mt-1">{new Date(schedule.follow_up).toLocaleString()}</p>
+                              <label className="text-sm font-medium text-gray-700">Follow-up Scheduled</label>
+                              <p className="text-blue-700 mt-1 font-medium">{new Date(schedule.follow_up).toLocaleString()}</p>
                             </div>
                           )}
                         </div>
@@ -904,8 +911,8 @@ const VaccinationScheduleForm = ({ pet, client, onBack }) => {
                         { className: "h-8 w-8 text-gray-400" }
                       )}
                     </div>
-                    <p>No {selectedHistoryService.replace('_', ' ')} records found for {pet.name}</p>
-                    <p className="text-sm mt-2">Records will appear here when you create them above.</p>
+                    <p className="text-gray-600">No {selectedHistoryService.replace('_', ' ')} records found for <span className="font-medium text-gray-900">{pet.name}</span></p>
+                    <p className="text-sm mt-2 text-gray-500">Records will appear here when you create them above.</p>
                   </div>
                 )}
               </div>
